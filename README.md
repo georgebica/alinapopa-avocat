@@ -37,7 +37,7 @@ All copy and business data live in typed files, so no CMS is required:
 
 ## Deployment
 
-Pushing to `master` triggers `.github/workflows/deploy.yml`, which builds the
+Pushing to `main` triggers `.github/workflows/deploy.yml`, which builds the
 static export and publishes `out/` to GitHub Pages.
 
 Two details that a plain static host makes fragile, both handled in the build:
