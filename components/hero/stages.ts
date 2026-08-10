@@ -45,12 +45,6 @@ export function stageStyle(progress: number, band: Band): StageStyle {
   return { opacity, y, scale };
 }
 
-export function activeStage(progress: number) {
-  if (progress < STAGE_BANDS[0].outEnd) return 0;
-  if (progress < STAGE_BANDS[1].outEnd) return 1;
-  return 2;
-}
-
 export function mapRange(
   value: number,
   [inMin, inMax]: [number, number],

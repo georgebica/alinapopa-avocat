@@ -1,13 +1,12 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { useMotionValueEvent, useScroll } from "framer-motion";
 import { firm } from "@/content/firm";
 import { CTAButtons } from "./CTAButtons";
 import { createRotationState, TOTAL_SWEEP } from "./hero/rotationState";
-import { STAGE_BANDS, activeStage, mapRange, stageStyle } from "./hero/stages";
+import { STAGE_BANDS, mapRange, stageStyle } from "./hero/stages";
 import { useMediaQuery } from "@/lib/useMediaQuery";
 
 const HeroScene = dynamic(() => import("./hero/HeroScene"), { ssr: false });
@@ -32,10 +31,8 @@ const STAGES = [
 export function Hero() {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const stageRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const indicatorRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const watermarkRef = useRef<HTMLParagraphElement>(null);
   const glowRef = useRef<HTMLDivElement>(null);
-  const cueRef = useRef<HTMLDivElement>(null);
   const topScrimRef = useRef<HTMLDivElement>(null);
   const bottomScrimRef = useRef<HTMLDivElement>(null);
   const mobileBarRef = useRef<HTMLDivElement>(null);
@@ -78,13 +75,6 @@ export function Hero() {
       node.style.pointerEvents = opacity < 0.05 ? "none" : "auto";
     });
 
-    const current = activeStage(progress);
-    indicatorRefs.current.forEach((node, index) => {
-      if (!node) return;
-      node.style.width = index === current ? "28px" : "10px";
-      node.style.opacity = index === current ? "1" : "0.35";
-    });
-
     if (watermarkRef.current) {
       watermarkRef.current.style.opacity = String(mapRange(progress, [0, 0.55], [0.05, 0.13]));
       watermarkRef.current.style.letterSpacing = `${mapRange(progress, [0, 1], [0, 0.06])}em`;
@@ -92,10 +82,6 @@ export function Hero() {
 
     if (glowRef.current) {
       glowRef.current.style.opacity = String(mapRange(progress, [0, 0.6], [0.55, 1]));
-    }
-
-    if (cueRef.current) {
-      cueRef.current.style.opacity = String(mapRange(progress, [0, 0.06], [1, 0]));
     }
 
     if (topScrimRef.current) {
@@ -145,12 +131,6 @@ export function Hero() {
           </div>
 
           <CTAButtons className="justify-center" />
-          <Link
-            href="/servicii"
-            className="text-sm font-medium text-bronze-deep underline-offset-4 hover:underline"
-          >
-            Descoperă domeniile de practică →
-          </Link>
         </div>
       </section>
     );
@@ -258,38 +238,6 @@ export function Hero() {
             {/* On phones the actions live in the fixed bar below instead, so the
                 scroll sequence never pushes them out of thumb reach. */}
             <CTAButtons className="hidden justify-center lg:flex" />
-
-            <Link
-              href="/servicii"
-              className="text-sm font-medium text-bronze-deep underline-offset-4 hover:underline"
-            >
-              Descoperă domeniile de practică →
-            </Link>
-
-            <div className="flex items-center gap-1.5" aria-hidden="true">
-              {STAGES.map((stage, index) => (
-                <span
-                  key={stage.id}
-                  ref={(node) => {
-                    indicatorRefs.current[index] = node;
-                  }}
-                  className="h-[3px] rounded-full bg-bronze transition-[width,opacity] duration-300"
-                  style={{
-                    width: index === 0 ? "28px" : "10px",
-                    opacity: index === 0 ? 1 : 0.35,
-                  }}
-                />
-              ))}
-            </div>
-
-            <div
-              ref={cueRef}
-              aria-hidden="true"
-              className="text-[0.65rem] uppercase tracking-[0.2em] text-charcoal-muted"
-              style={{ opacity: 1 }}
-            >
-              Derulați
-            </div>
           </div>
         </div>
       </div>
