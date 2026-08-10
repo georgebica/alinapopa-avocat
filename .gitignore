@@ -39,3 +39,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Uncompressed source assets. `source/Lady Justice.glb` is ~91 MB, which would
+# bloat every clone forever; the build only needs the optimised
+# public/models/statue.glb (1.7 MB), which IS committed. Regenerate it with:
+#   npx gltf-transform optimize "source/Lady Justice.glb" public/models/statue.glb \
+#     --compress meshopt --simplify-ratio 0.1 --simplify-error 0.01 --texture-compress false
+/source/

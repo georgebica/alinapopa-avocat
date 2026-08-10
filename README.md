@@ -1,36 +1,72 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Alina Popa – Cabinet de Avocat
 
-## Getting Started
+Website for a law practice in Timișoara, member of Baroul Timiș. Fifteen statically
+generated pages in Romanian, built mobile-first, with a scroll-driven 3D hero.
 
-First, run the development server:
+**Live:** https://georgebica.github.io/alinapopa-avocat/
+
+## Stack
+
+- **Next.js 16** (App Router) — every page prerendered, exported as static HTML
+- **Tailwind CSS v4** — design tokens defined in `app/globals.css`
+- **Three.js** via `@react-three/fiber` / `drei` — the hero statue, lazy-loaded
+- **next-sitemap** — generates `sitemap.xml` and `robots.txt` at build time
+
+## Local development
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev          # http://localhost:3000/alinapopa-avocat
+npm run build        # static export into out/
+npm run lint
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Because the site is deployed under a project sub-path, `next dev` also serves it
+from `/alinapopa-avocat` — the bare `http://localhost:3000/` will 404.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Content
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+All copy and business data live in typed files, so no CMS is required:
 
-## Learn More
+- `content/firm.ts` — single source of truth for name, address, phone, hours,
+  values. Everything else (footer, contact page, JSON-LD schema) reads from it,
+  so the NAP can never drift out of sync between pages.
+- `content/services/*.ts` — one file per practice area (intro, sub-services, FAQ,
+  related areas). Adding a tenth practice area is a new data file, not a new page:
+  `app/servicii/[slug]/page.tsx` renders them all.
 
-To learn more about Next.js, take a look at the following resources:
+## Deployment
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Pushing to `master` triggers `.github/workflows/deploy.yml`, which builds the
+static export and publishes `out/` to GitHub Pages.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Two details that a plain static host makes fragile, both handled in the build:
 
-## Deploy on Vercel
+- **`basePath`** — set in `next.config.ts` and exposed to the client as
+  `NEXT_PUBLIC_BASE_PATH`. `next/link` and bundled assets get the prefix
+  automatically, but URLs requested at runtime do not — the hero's `.glb` builds
+  its path from that variable.
+- **RSC prefetch payloads** — Next 16 writes them into nested `__next.*`
+  directories while the client requests a dot-joined filename. A Next server maps
+  between the two; GitHub Pages cannot, so `scripts/flatten-rsc-payloads.mjs`
+  copies each payload to the flat name. Without it every prefetch 404s and
+  navigation degrades to full page reloads.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Moving to a custom domain
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Add `public/CNAME` containing the domain.
+2. Set `PAGES_BASE_PATH=""` and `NEXT_PUBLIC_SITE_URL=https://<domain>` in the
+   workflow's build step, and `SITE_URL` for next-sitemap.
+3. Point the domain's DNS at GitHub Pages, then set it under Settings → Pages.
+
+## Notes
+
+- There is no contact form. GitHub Pages serves static files only, so a form
+  would need a third-party endpoint; the contact page leads with phone, WhatsApp
+  and email instead. If a form is wanted later, wire it to a service such as
+  Formspree or Web3Forms and restore the consent copy in the privacy policy.
+- The source model is `source/Lady Justice.glb` (95 MB). The served version,
+  `public/models/statue.glb`, is 1.7 MB — simplified and Meshopt-compressed with
+  `npx gltf-transform optimize`.
+- The hero respects `prefers-reduced-motion`: no pinning, no rotation, and the
+  whole statue shown uncropped in its own block.

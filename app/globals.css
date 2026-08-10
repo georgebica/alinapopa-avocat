@@ -1,26 +1,85 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --cream: #f7f5f1;
+  --ink: #201e1b;
+  --charcoal-muted: #6b675f;
+  --bronze: #8a6a3f;
+  --bronze-deep: #5e4a2e;
+  --line: #e4dfd5;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-cream: var(--cream);
+  --color-ink: var(--ink);
+  --color-charcoal-muted: var(--charcoal-muted);
+  --color-bronze: var(--bronze);
+  --color-bronze-deep: var(--bronze-deep);
+  --color-line: var(--line);
+
+  --font-display: var(--font-fraunces);
+  --font-sans: var(--font-public-sans);
+
+  --text-h1: 2rem;
+  --text-h1--line-height: 1.15;
+  --text-h1--letter-spacing: -0.01em;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background: var(--color-cream);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+
+  h1 {
+    font-size: 2rem;
+    line-height: 1.15;
+  }
+
+  @media (min-width: 1024px) {
+    h1 {
+      font-size: 3.5rem;
+    }
+  }
+
+  a,
+  button {
+    -webkit-tap-highlight-color: transparent;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer utilities {
+  .min-tap {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

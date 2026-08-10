@@ -5,15 +5,23 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "postbuild": "next-sitemap && node scripts/flatten-rsc-payloads.mjs out",
     "start": "next start",
     "lint": "eslint"
   },
   "dependencies": {
+    "@react-three/drei": "^10.7.8",
+    "@react-three/fiber": "^9.7.0",
+    "@types/three": "^0.185.4",
+    "framer-motion": "^13.0.0",
     "next": "16.3.0",
+    "next-sitemap": "^4.2.3",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "three": "^0.185.1"
   },
   "devDependencies": {
+    "@gltf-transform/cli": "^4.4.2",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
