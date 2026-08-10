@@ -6,7 +6,7 @@ import { useMotionValueEvent, useScroll } from "framer-motion";
 import { firm } from "@/content/firm";
 import { CTAButtons } from "./CTAButtons";
 import { createRotationState, TOTAL_SWEEP } from "./hero/rotationState";
-import { STAGE_BANDS, mapRange, stageStyle } from "./hero/stages";
+import { STAGE_BANDS, WORD_FILL_RANGE, mapRange, stageStyle } from "./hero/stages";
 import { useMediaQuery } from "@/lib/useMediaQuery";
 
 const HeroScene = dynamic(() => import("./hero/HeroScene"), { ssr: false });
@@ -19,18 +19,20 @@ const STAGES = [
     body: firm.positioning,
   },
   {
-    id: "credentials",
-    body: `Cabinet de avocatură fondat în ${firm.founded}, membru al ${firm.barGenitive}. Peste ${firm.yearsOfExperience} ani de consultanță juridică și reprezentare în litigii.`,
-  },
-  {
-    id: "approach",
-    body: "Fiecare speță este analizată individual, cu confidențialitate deplină și atenție la obiectivele dumneavoastră.",
+    id: "closing",
+    body: `Cabinet de avocatură fondat în ${firm.founded}, membru al ${firm.barGenitive}. Peste ${firm.yearsOfExperience} ani de consultanță juridică și reprezentare în litigii, fiecare speță fiind analizată individual, cu confidențialitate deplină și atenție la obiectivele dumneavoastră.`,
   },
 ];
+
+const CLOSING_WORDS = STAGES[1].body.split(" ");
+
+/** Opacity of a word before the scroll sweep reaches it. */
+const DIM_WORD_OPACITY = 0.28;
 
 export function Hero() {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const stageRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const wordRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const watermarkRef = useRef<HTMLParagraphElement>(null);
   const glowRef = useRef<HTMLDivElement>(null);
   const topScrimRef = useRef<HTMLDivElement>(null);
@@ -73,6 +75,16 @@ export function Hero() {
       node.style.transform = `translateY(${y}px) scale(${scale})`;
       // Fully faded stages must not swallow taps from the CTAs beneath them.
       node.style.pointerEvents = opacity < 0.05 ? "none" : "auto";
+    });
+
+    // Light the closing paragraph one word at a time. Each word gets its own
+    // slice of the fill range, with the fractional remainder easing that word in
+    // so the edge of the sweep is soft rather than a hard on/off boundary.
+    const fill = mapRange(progress, WORD_FILL_RANGE, [0, 1]) * CLOSING_WORDS.length;
+    wordRefs.current.forEach((node, index) => {
+      if (!node) return;
+      const lit = Math.min(1, Math.max(0, fill - index));
+      node.style.opacity = String(DIM_WORD_OPACITY + lit * (1 - DIM_WORD_OPACITY));
     });
 
     if (watermarkRef.current) {
@@ -216,23 +228,33 @@ export function Hero() {
             </h1>
           </div>
 
-          {/* Closing copy, beneath the statue. */}
+          {/* Closing copy, beneath the statue. Words light from muted to ink as
+              the sequence runs out, so the paragraph resolves as the statue
+              settles on its half turn. */}
           <div className="flex w-full flex-col items-center gap-5">
-            <div className="grid w-full">
-              {STAGES.slice(1).map((stage, index) => (
-                <div
-                  key={stage.id}
-                  ref={(node) => {
-                    stageRefs.current[index + 1] = node;
-                  }}
-                  className="col-start-1 row-start-1 flex justify-center will-change-[opacity,transform]"
-                  style={{ opacity: 0, transform: "translateY(22px) scale(0.985)" }}
-                >
-                  <p className="max-w-2xl text-balance font-display text-xl font-medium leading-snug text-ink sm:text-2xl lg:text-[2rem] lg:leading-[1.25]">
-                    {stage.body}
-                  </p>
-                </div>
-              ))}
+            <div
+              ref={(node) => {
+                stageRefs.current[1] = node;
+              }}
+              className="flex w-full justify-center will-change-[opacity,transform]"
+              style={{ opacity: 0, transform: "translateY(22px) scale(0.985)" }}
+            >
+              <p className="max-w-3xl text-balance font-display text-lg font-medium leading-snug text-ink sm:text-xl lg:text-[1.6rem] lg:leading-[1.35]">
+                {CLOSING_WORDS.map((word, index) => (
+                  <span
+                    key={`${word}-${index}`}
+                    ref={(node) => {
+                      wordRefs.current[index] = node;
+                    }}
+                    // Rendered lit so the paragraph is legible without scripting;
+                    // the scroll handler dims it long before the stage fades in.
+                    className="transition-opacity duration-300 ease-out"
+                  >
+                    {word}
+                    {index < CLOSING_WORDS.length - 1 ? " " : ""}
+                  </span>
+                ))}
+              </p>
             </div>
 
             {/* On phones the actions live in the fixed bar below instead, so the

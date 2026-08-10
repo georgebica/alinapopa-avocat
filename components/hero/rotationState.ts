@@ -18,5 +18,6 @@ export function createRotationState(): RotationState {
   return { base: 0.35, sweep: 0, progress: 0, reducedMotion: false };
 }
 
-/** Total rotation swept across the full pinned scroll — just under a full turn. */
-export const TOTAL_SWEEP = Math.PI * 1.75;
+/** Total rotation swept across the full pinned scroll — a half turn, so the
+ *  sequence ends on the statue's back, facing away from the viewer. */
+export const TOTAL_SWEEP = Math.PI;

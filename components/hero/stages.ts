@@ -15,10 +15,14 @@ export type Band = {
 };
 
 export const STAGE_BANDS: Band[] = [
-  { inStart: -0.2, inEnd: -0.1, outStart: 0.2, outEnd: 0.31 },
-  { inStart: 0.28, inEnd: 0.39, outStart: 0.55, outEnd: 0.66 },
-  { inStart: 0.63, inEnd: 0.74, outStart: 1.2, outEnd: 1.3 },
+  // Opening headline, above the statue's head.
+  { inStart: -0.2, inEnd: -0.1, outStart: 0.2, outEnd: 0.32 },
+  // Closing paragraph, beneath the figure — holds to the end of the sequence.
+  { inStart: 0.28, inEnd: 0.42, outStart: 1.2, outEnd: 1.3 },
 ];
+
+/** Scroll range over which the closing paragraph lights up, word by word. */
+export const WORD_FILL_RANGE: [number, number] = [0.44, 0.92];
 
 /** Distance (px) a stage travels as it enters from below / exits upward. */
 const TRAVEL = 22;
