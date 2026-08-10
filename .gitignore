@@ -48,4 +48,9 @@ next-env.d.ts
 # public/models/statue.glb (1.7 MB), which IS committed. Regenerate it with:
 #   npx gltf-transform optimize "source/Lady Justice.glb" public/models/statue.glb \
 #     --compress meshopt --simplify-ratio 0.1 --simplify-error 0.01 --texture-compress false
+#
+# The nine 1080p practice-area renders in here (~20 MB) are the same deal: the
+# build only needs the 1.5 MB of loops and posters committed under
+# public/videos/. Regenerate those with:
+#   node scripts/encode-practice-videos.mjs
 /source/

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { services } from "@/content/services";
 import { ServiceHero } from "@/components/ServiceHero";
-import { PracticeAreaCard } from "@/components/PracticeAreaCard";
+import { PracticeBand } from "@/components/PracticeBand";
 import { Reveal } from "@/components/Reveal";
 import { CTABanner } from "@/components/CTABanner";
 
@@ -25,10 +25,10 @@ export default function ServiciiPage() {
             de circumstanțele concrete și obiectivele clientului.
           </p>
 
-          <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-14 flex flex-col gap-20 lg:mt-20 lg:gap-28">
             {services.map((service, index) => (
-              <Reveal key={service.slug} delay={(index % 3) * 90} className="h-full">
-                <PracticeAreaCard service={service} />
+              <Reveal key={service.slug}>
+                <PracticeBand service={service} index={index} total={services.length} />
               </Reveal>
             ))}
           </div>

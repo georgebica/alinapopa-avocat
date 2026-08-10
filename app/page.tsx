@@ -3,7 +3,7 @@ import { firm } from "@/content/firm";
 import { services } from "@/content/services";
 import { Hero } from "@/components/Hero";
 import { StatBand } from "@/components/StatBand";
-import { PracticeAreaCard } from "@/components/PracticeAreaCard";
+import { PracticeBand } from "@/components/PracticeBand";
 import { Reveal } from "@/components/Reveal";
 import { ValueCard } from "@/components/ValueCard";
 import { ConfidentialityBlock } from "@/components/ConfidentialityBlock";
@@ -58,10 +58,10 @@ export default function Home() {
           <h2 className="mt-3 max-w-2xl text-2xl lg:text-3xl">
             Consultanță și reprezentare într-o gamă variată de domenii juridice
           </h2>
-          <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-14 flex flex-col gap-20 lg:mt-20 lg:gap-28">
             {services.map((service, index) => (
-              <Reveal key={service.slug} delay={(index % 3) * 90} className="h-full">
-                <PracticeAreaCard service={service} />
+              <Reveal key={service.slug}>
+                <PracticeBand service={service} index={index} total={services.length} />
               </Reveal>
             ))}
           </div>
