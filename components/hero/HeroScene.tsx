@@ -4,7 +4,7 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { Environment } from "@react-three/drei";
 import { Suspense, useRef, type RefObject } from "react";
 import * as THREE from "three";
-import { StatueModel, type Framing } from "./StatueModel";
+import { StatueModel, HERO_FOV, type Framing } from "./StatueModel";
 import type { RotationState } from "./rotationState";
 
 type Variant = "desktop" | "mobile" | "static";
@@ -56,7 +56,7 @@ export default function HeroScene({ rotationRef, variant = "desktop" }: Props) {
     <Canvas
       dpr={[1, 1.75]}
       gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
-      camera={{ position: [0, 0, 5], fov: 30 }}
+      camera={{ position: [0, 0, 5], fov: HERO_FOV }}
     >
       <ambientLight intensity={0.42} />
       <TrackingLights />

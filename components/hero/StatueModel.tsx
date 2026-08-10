@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, type RefObject } from "react";
+import { useMemo, useRef, type RefObject } from "react";
 import * as THREE from "three";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useGLTF } from "@react-three/drei";
@@ -9,6 +9,9 @@ import type { RotationState } from "./rotationState";
 // Requested by the loader at runtime, so it needs the deployment's basePath
 // applied by hand — Next only rewrites next/link hrefs and bundled assets.
 const MODEL_PATH = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/models/statue.glb`;
+
+/** Shared with the Canvas camera prop so the framing maths matches the camera. */
+export const HERO_FOV = 30;
 
 export type Framing = {
   /**
@@ -37,9 +40,8 @@ export function StatueModel({
 }) {
   const { scene } = useGLTF(MODEL_PATH);
   const groupRef = useRef<THREE.Group>(null);
-  const camera = useThree((state) => state.camera);
   const size = useThree((state) => state.size);
-  const plan = useRef({ yFrom: 0, yTo: 0 });
+  const cameraPlaced = useRef(false);
 
   const { model, offset, radius, height } = useMemo(() => {
     const clone = scene.clone(true);
@@ -86,43 +88,57 @@ export function StatueModel({
     };
   }, [scene]);
 
-  // Park the camera: distance sets how much of the statue the frame holds, and
-  // the pan endpoints are the heights the scroll travels between.
-  useEffect(() => {
-    if (!(camera instanceof THREE.PerspectiveCamera) || !size.height) return;
-
-    const vFov = THREE.MathUtils.degToRad(camera.fov);
+  // Where the camera sits: distance decides how much of the statue the frame
+  // holds, and the pan endpoints are the heights the scroll travels between.
+  // Pure — the values are applied to the camera in the frame loop below.
+  const view = useMemo(() => {
+    const vFov = THREE.MathUtils.degToRad(HERO_FOV);
     const visibleHeight = height / framing.scale;
     let distance = visibleHeight / 2 / Math.tan(vFov / 2);
 
-    if (framing.fitWidth) {
+    if (framing.fitWidth && size.height > 0) {
       const aspect = size.width / size.height;
       const hFov = 2 * Math.atan(Math.tan(vFov / 2) * aspect);
       distance = Math.max(distance, radius / Math.tan(hFov / 2));
     }
 
-    plan.current = { yFrom: framing.panFrom * height, yTo: framing.panTo * height };
-
-    camera.position.set(0, plan.current.yFrom, distance);
-    camera.updateProjectionMatrix();
-  }, [camera, size, height, radius, framing]);
+    return {
+      distance,
+      yFrom: framing.panFrom * height,
+      yTo: framing.panTo * height,
+    };
+  }, [size.width, size.height, height, radius, framing]);
 
   useFrame((state, delta) => {
     const group = groupRef.current;
     if (!group) return;
 
     const rotation = rotationRef.current;
-    const follow = Math.min(1, delta * 6);
+    // Exponential smoothing is frame-rate independent, unlike `delta * k`, whose
+    // step size balloons whenever a frame is dropped — the usual source of
+    // stutter in a scene heavy enough to miss frames.
+    const settle = (perSecond: number) => 1 - Math.exp(-perSecond * delta);
+    const progress = Math.min(1, Math.max(0, rotation.progress));
 
     const bob = rotation.reducedMotion ? 0 : Math.sin(state.clock.elapsedTime * 0.6) * 0.02;
     const targetRotation = rotation.base + rotation.sweep + bob;
-    // Damped follow so scroll-driven motion doesn't feel jittery frame to frame.
-    group.rotation.y += (targetRotation - group.rotation.y) * follow;
+    group.rotation.y += (targetRotation - group.rotation.y) * settle(7);
 
-    // Dolly the camera down the statue as the sequence advances.
-    const { yFrom, yTo } = plan.current;
-    const targetY = yFrom + (yTo - yFrom) * rotation.progress;
-    state.camera.position.y += (targetY - state.camera.position.y) * follow;
+    // Dolly the camera down the statue as the sequence advances. Tracks tighter
+    // than the rotation so the vertical travel stays locked to the scrollbar.
+    const camera = state.camera;
+    camera.position.x = 0;
+    camera.position.z = view.distance;
+
+    const targetY = view.yFrom + (view.yTo - view.yFrom) * progress;
+    if (cameraPlaced.current) {
+      camera.position.y += (targetY - camera.position.y) * settle(16);
+    } else {
+      // First frame — and after a reload part-way down the page — start exactly
+      // where the scroll says, rather than sweeping in from the top.
+      camera.position.y = targetY;
+      cameraPlaced.current = true;
+    }
   });
 
   return (

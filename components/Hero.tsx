@@ -38,6 +38,7 @@ export function Hero() {
   const cueRef = useRef<HTMLDivElement>(null);
   const topScrimRef = useRef<HTMLDivElement>(null);
   const bottomScrimRef = useRef<HTMLDivElement>(null);
+  const mobileBarRef = useRef<HTMLDivElement>(null);
   const rotationState = useRef(createRotationState());
 
   const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
@@ -103,6 +104,15 @@ export function Hero() {
 
     if (bottomScrimRef.current) {
       bottomScrimRef.current.style.opacity = String(mapRange(progress, [0.15, 0.45], [0.75, 1]));
+    }
+
+    if (mobileBarRef.current) {
+      // Slides away as the hero hands over to the page, and comes back if the
+      // viewer scrolls up into the sequence again.
+      const retreat = mapRange(progress, [0.94, 1], [0, 1]);
+      mobileBarRef.current.style.transform = `translateY(${retreat * 100}%)`;
+      mobileBarRef.current.style.opacity = String(1 - retreat);
+      mobileBarRef.current.style.pointerEvents = retreat > 0.5 ? "none" : "auto";
     }
   });
 
@@ -205,7 +215,8 @@ export function Hero() {
           }}
         />
 
-        <div className="relative z-10 mx-auto flex h-full w-full max-w-4xl flex-col items-center justify-between px-6 pb-8 pt-8 text-center lg:pb-10 lg:pt-12">
+        {/* pb on phones clears the fixed action bar. */}
+        <div className="relative z-10 mx-auto flex h-full w-full max-w-4xl flex-col items-center justify-between px-6 pb-24 pt-8 text-center lg:pb-10 lg:pt-12">
           {/* Opening copy, above the statue's head. Hands off to the block below
               as the camera dollies down the figure. */}
           <div
@@ -237,14 +248,16 @@ export function Hero() {
                   className="col-start-1 row-start-1 flex justify-center will-change-[opacity,transform]"
                   style={{ opacity: 0, transform: "translateY(22px) scale(0.985)" }}
                 >
-                  <p className="max-w-2xl text-balance text-lg leading-snug text-ink sm:text-xl lg:text-[1.75rem] lg:leading-[1.3]">
+                  <p className="max-w-2xl text-balance font-display text-xl font-medium leading-snug text-ink sm:text-2xl lg:text-[2rem] lg:leading-[1.25]">
                     {stage.body}
                   </p>
                 </div>
               ))}
             </div>
 
-            <CTAButtons className="justify-center" />
+            {/* On phones the actions live in the fixed bar below instead, so the
+                scroll sequence never pushes them out of thumb reach. */}
+            <CTAButtons className="hidden justify-center lg:flex" />
 
             <Link
               href="/servicii"
@@ -279,6 +292,18 @@ export function Hero() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Phone-only action bar, held against the bottom of the screen for the
+          whole hero sequence and retired once the copy has finished. Rendered
+          outside the sticky container so it is positioned against the viewport
+          rather than that element. */}
+      <div
+        ref={mobileBarRef}
+        className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-cream/95 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur lg:hidden"
+        style={{ opacity: 1 }}
+      >
+        <CTAButtons layout="bar" />
       </div>
     </section>
   );
