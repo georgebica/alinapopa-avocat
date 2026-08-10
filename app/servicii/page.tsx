@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { services } from "@/content/services";
 import { ServiceHero } from "@/components/ServiceHero";
 import { PracticeAreaCard } from "@/components/PracticeAreaCard";
+import { Reveal } from "@/components/Reveal";
 import { CTABanner } from "@/components/CTABanner";
 
 export const metadata: Metadata = {
@@ -16,7 +17,7 @@ export default function ServiciiPage() {
     <>
       <ServiceHero title="Domenii de practică" crumbs={[{ name: "Servicii", url: "/servicii" }]} />
 
-      <section className="px-6 py-12 lg:px-16 lg:py-16">
+      <section className="bg-sand px-6 py-12 lg:px-16 lg:py-16">
         <div className="mx-auto max-w-6xl">
           <p className="max-w-2xl text-base leading-relaxed text-charcoal-muted">
             Cabinetul de Avocat Alina Popa oferă consultanță juridică și reprezentare în litigii
@@ -25,8 +26,10 @@ export default function ServiciiPage() {
           </p>
 
           <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {services.map((service) => (
-              <PracticeAreaCard key={service.slug} service={service} />
+            {services.map((service, index) => (
+              <Reveal key={service.slug} delay={(index % 3) * 90} className="h-full">
+                <PracticeAreaCard service={service} />
+              </Reveal>
             ))}
           </div>
         </div>

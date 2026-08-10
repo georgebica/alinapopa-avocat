@@ -31,9 +31,9 @@ export default function ContactPage() {
           <div className="mt-10 grid gap-4 sm:grid-cols-3">
             <a
               href={telLink()}
-              className="min-tap flex flex-col gap-2 rounded-2xl border border-line bg-cream p-6 transition-colors hover:border-bronze"
+              className="min-tap flex flex-col gap-2 rounded-2xl border border-line bg-surface p-6 transition-colors hover:border-burgundy"
             >
-              <PhoneIcon className="h-6 w-6 text-bronze" />
+              <PhoneIcon className="h-6 w-6 text-burgundy" />
               <span className="font-display text-lg text-ink">Sunați acum</span>
               <span className="text-sm text-charcoal-muted">{firm.phoneDisplay}</span>
             </a>
@@ -44,24 +44,24 @@ export default function ContactPage() {
               )}
               target="_blank"
               rel="noopener noreferrer"
-              className="min-tap flex flex-col gap-2 rounded-2xl border border-line bg-cream p-6 transition-colors hover:border-bronze"
+              className="min-tap flex flex-col gap-2 rounded-2xl border border-line bg-surface p-6 transition-colors hover:border-burgundy"
             >
-              <WhatsAppIcon className="h-6 w-6 text-bronze" />
+              <WhatsAppIcon className="h-6 w-6 text-burgundy" />
               <span className="font-display text-lg text-ink">Scrieți pe WhatsApp</span>
               <span className="text-sm text-charcoal-muted">{firm.phoneDisplay}</span>
             </a>
 
             <a
               href={mailtoLink(CONSULTATION_SUBJECT)}
-              className="min-tap flex flex-col gap-2 rounded-2xl border border-line bg-cream p-6 transition-colors hover:border-bronze"
+              className="min-tap flex flex-col gap-2 rounded-2xl border border-line bg-surface p-6 transition-colors hover:border-burgundy"
             >
-              <MailIcon className="h-6 w-6 text-bronze" />
+              <MailIcon className="h-6 w-6 text-burgundy" />
               <span className="font-display text-lg text-ink">Trimiteți un email</span>
               <span className="break-all text-sm text-charcoal-muted">{firm.email}</span>
             </a>
           </div>
 
-          <div className="mt-8 rounded-2xl border border-line bg-white p-6">
+          <div className="mt-8 rounded-2xl border border-line bg-sand p-6">
             <p className="text-sm font-medium text-ink">
               Ce este util să includeți în primul mesaj
             </p>
@@ -84,7 +84,7 @@ export default function ContactPage() {
 
               <ul className="mt-6 flex flex-col gap-4 text-sm text-ink">
                 <li className="flex items-start gap-3">
-                  <MapPinIcon className="mt-0.5 h-5 w-5 shrink-0 text-bronze" />
+                  <MapPinIcon className="mt-0.5 h-5 w-5 shrink-0 text-burgundy" />
                   <span>
                     {firm.address.street}
                     <br />
@@ -92,19 +92,19 @@ export default function ContactPage() {
                   </span>
                 </li>
                 <li className="flex items-center gap-3">
-                  <PhoneIcon className="h-5 w-5 shrink-0 text-bronze" />
-                  <a href={telLink()} className="hover:text-bronze-deep">
+                  <PhoneIcon className="h-5 w-5 shrink-0 text-burgundy" />
+                  <a href={telLink()} className="hover:text-burgundy-deep">
                     {firm.phoneDisplay}
                   </a>
                 </li>
                 <li className="flex items-center gap-3">
-                  <MailIcon className="h-5 w-5 shrink-0 text-bronze" />
-                  <a href={mailtoLink()} className="hover:text-bronze-deep">
+                  <MailIcon className="h-5 w-5 shrink-0 text-burgundy" />
+                  <a href={mailtoLink()} className="hover:text-burgundy-deep">
                     {firm.email}
                   </a>
                 </li>
                 <li className="flex items-center gap-3">
-                  <ClockIcon className="h-5 w-5 shrink-0 text-bronze" />
+                  <ClockIcon className="h-5 w-5 shrink-0 text-burgundy" />
                   {firm.hours.display}
                 </li>
               </ul>

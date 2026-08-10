@@ -4,6 +4,7 @@ import { services } from "@/content/services";
 import { Hero } from "@/components/Hero";
 import { StatBand } from "@/components/StatBand";
 import { PracticeAreaCard } from "@/components/PracticeAreaCard";
+import { Reveal } from "@/components/Reveal";
 import { ValueCard } from "@/components/ValueCard";
 import { ConfidentialityBlock } from "@/components/ConfidentialityBlock";
 import { CTABanner } from "@/components/CTABanner";
@@ -27,7 +28,7 @@ export default function Home() {
       <section className="px-6 py-16 lg:px-16 lg:py-24">
         <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[2fr_3fr] lg:gap-16">
           <div>
-            <p className="text-sm font-medium uppercase tracking-[0.2em] text-bronze">
+            <p className="text-sm font-medium uppercase tracking-[0.2em] text-burgundy">
               Prezentare
             </p>
             <h2 className="mt-3 text-2xl lg:text-3xl">Cabinet de Avocat Alina Popa</h2>
@@ -49,17 +50,19 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="border-t border-line bg-white px-6 py-16 lg:px-16 lg:py-24">
+      <section className="border-t border-line bg-sand px-6 py-16 lg:px-16 lg:py-24">
         <div className="mx-auto max-w-6xl">
-          <p className="text-sm font-medium uppercase tracking-[0.2em] text-bronze">
+          <p className="text-sm font-medium uppercase tracking-[0.2em] text-burgundy">
             Domenii de practică
           </p>
           <h2 className="mt-3 max-w-2xl text-2xl lg:text-3xl">
             Consultanță și reprezentare într-o gamă variată de domenii juridice
           </h2>
           <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {services.map((service) => (
-              <PracticeAreaCard key={service.slug} service={service} />
+            {services.map((service, index) => (
+              <Reveal key={service.slug} delay={(index % 3) * 90} className="h-full">
+                <PracticeAreaCard service={service} />
+              </Reveal>
             ))}
           </div>
         </div>
@@ -67,7 +70,7 @@ export default function Home() {
 
       <section className="border-t border-line px-6 py-16 lg:px-16 lg:py-24">
         <div className="mx-auto max-w-6xl">
-          <p className="text-sm font-medium uppercase tracking-[0.2em] text-bronze">
+          <p className="text-sm font-medium uppercase tracking-[0.2em] text-burgundy">
             Avantaje
           </p>
           <h2 className="mt-3 max-w-2xl text-2xl lg:text-3xl">Valorile cabinetului</h2>
@@ -86,12 +89,12 @@ export default function Home() {
       <section className="border-t border-line px-6 py-16 lg:px-16 lg:py-24">
         <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-2 lg:gap-16">
           <div>
-            <p className="text-sm font-medium uppercase tracking-[0.2em] text-bronze">Contact</p>
+            <p className="text-sm font-medium uppercase tracking-[0.2em] text-burgundy">Contact</p>
             <h2 className="mt-3 text-2xl lg:text-3xl">Date de contact</h2>
 
             <ul className="mt-8 flex flex-col gap-5 text-base text-ink">
               <li className="flex items-start gap-3">
-                <MapPinIcon className="mt-0.5 h-5 w-5 shrink-0 text-bronze" />
+                <MapPinIcon className="mt-0.5 h-5 w-5 shrink-0 text-burgundy" />
                 <span>
                   {firm.address.street}
                   <br />
@@ -99,19 +102,19 @@ export default function Home() {
                 </span>
               </li>
               <li className="flex items-center gap-3">
-                <PhoneIcon className="h-5 w-5 shrink-0 text-bronze" />
-                <a href={telLink()} className="hover:text-bronze-deep">
+                <PhoneIcon className="h-5 w-5 shrink-0 text-burgundy" />
+                <a href={telLink()} className="hover:text-burgundy-deep">
                   {firm.phoneDisplay}
                 </a>
               </li>
               <li className="flex items-center gap-3">
-                <MailIcon className="h-5 w-5 shrink-0 text-bronze" />
-                <a href={mailtoLink()} className="hover:text-bronze-deep">
+                <MailIcon className="h-5 w-5 shrink-0 text-burgundy" />
+                <a href={mailtoLink()} className="hover:text-burgundy-deep">
                   {firm.email}
                 </a>
               </li>
               <li className="flex items-center gap-3">
-                <ClockIcon className="h-5 w-5 shrink-0 text-bronze" />
+                <ClockIcon className="h-5 w-5 shrink-0 text-burgundy" />
                 {firm.hours.display}
               </li>
             </ul>

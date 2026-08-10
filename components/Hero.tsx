@@ -76,7 +76,7 @@ export function Hero() {
     });
 
     if (watermarkRef.current) {
-      watermarkRef.current.style.opacity = String(mapRange(progress, [0, 0.55], [0.05, 0.13]));
+      watermarkRef.current.style.opacity = String(mapRange(progress, [0, 0.55], [0.07, 0.17]));
       watermarkRef.current.style.letterSpacing = `${mapRange(progress, [0, 1], [0, 0.06])}em`;
     }
 
@@ -106,9 +106,9 @@ export function Hero() {
   // the statue simply sits in its own block between the copy and the CTAs.
   if (reducedMotion) {
     return (
-      <section className="relative overflow-hidden border-b border-line bg-cream px-6 py-12">
+      <section className="relative overflow-hidden border-b border-line bg-surface px-6 py-12">
         <div className="mx-auto flex max-w-3xl flex-col items-center gap-5 text-center">
-          <p className="text-[0.7rem] font-medium uppercase tracking-[0.28em] text-bronze sm:text-xs">
+          <p className="text-[0.7rem] font-medium uppercase tracking-[0.28em] text-burgundy sm:text-xs">
             {firm.legalName} · {firm.city}
           </p>
           <h1 className="text-balance text-[1.7rem] leading-[1.15] text-ink sm:text-[2rem] lg:text-[3.5rem]">
@@ -121,7 +121,7 @@ export function Hero() {
           <div className="relative my-2 h-[38vh] min-h-[240px] w-full">
             <p
               aria-hidden="true"
-              className="pointer-events-none absolute left-1/2 top-1/2 w-full -translate-x-1/2 -translate-y-1/2 select-none text-center font-display text-[23vw] font-medium leading-none text-ink opacity-[0.07] lg:text-[15vw]"
+              className="pointer-events-none absolute left-1/2 top-1/2 w-full -translate-x-1/2 -translate-y-1/2 select-none text-center font-display text-[23vw] font-medium leading-none text-burgundy opacity-[0.09] lg:text-[15vw]"
             >
               {WATERMARK}
             </p>
@@ -139,7 +139,7 @@ export function Hero() {
   return (
     <section
       ref={wrapperRef}
-      className="relative border-b border-line bg-cream"
+      className="relative border-b border-line bg-surface"
       style={{ height: "320vh" }}
     >
       <div className="sticky top-16 flex h-[calc(100svh-4rem)] min-h-[600px] flex-col overflow-hidden">
@@ -151,15 +151,15 @@ export function Hero() {
           style={{
             opacity: 0.55,
             background:
-              "radial-gradient(circle, rgba(198,164,111,0.30) 0%, rgba(198,164,111,0.10) 45%, rgba(198,164,111,0) 70%)",
+              "radial-gradient(circle, rgba(185,149,92,0.28) 0%, rgba(124,29,46,0.07) 48%, rgba(255,255,255,0) 72%)",
           }}
         />
 
         <p
           ref={watermarkRef}
           aria-hidden="true"
-          style={{ opacity: 0.05 }}
-          className="pointer-events-none absolute left-1/2 top-1/2 w-full -translate-x-1/2 -translate-y-1/2 select-none text-center font-display text-[23vw] font-medium leading-none text-ink lg:text-[15vw]"
+          style={{ opacity: 0.07 }}
+          className="pointer-events-none absolute left-1/2 top-1/2 w-full -translate-x-1/2 -translate-y-1/2 select-none text-center font-display text-[23vw] font-medium leading-none text-burgundy lg:text-[15vw]"
         >
           {WATERMARK}
         </p>
@@ -179,7 +179,7 @@ export function Hero() {
           style={{
             opacity: 1,
             background:
-              "linear-gradient(to bottom, #F7F5F1 0%, #F7F5F1 40%, rgba(247,245,241,0.72) 64%, rgba(247,245,241,0) 100%)",
+              "linear-gradient(to bottom, #FFFFFF 0%, #FFFFFF 40%, rgba(255,255,255,0.72) 64%, rgba(255,255,255,0) 100%)",
           }}
         />
         <div
@@ -191,7 +191,7 @@ export function Hero() {
             // Solid under the CTA stack, with the falloff concentrated in the top
             // third so it never veils the statue's face.
             background:
-              "linear-gradient(to top, #F7F5F1 0%, #F7F5F1 48%, rgba(247,245,241,0.92) 68%, rgba(247,245,241,0.45) 84%, rgba(247,245,241,0) 100%)",
+              "linear-gradient(to top, #FFFFFF 0%, #FFFFFF 48%, rgba(255,255,255,0.92) 68%, rgba(255,255,255,0.45) 84%, rgba(255,255,255,0) 100%)",
           }}
         />
 
@@ -206,7 +206,7 @@ export function Hero() {
             className="flex w-full flex-col items-center gap-3 will-change-[opacity,transform]"
             style={{ opacity: 1 }}
           >
-            <p className="text-[0.7rem] font-medium uppercase tracking-[0.28em] text-bronze sm:text-xs">
+            <p className="text-[0.7rem] font-medium uppercase tracking-[0.28em] text-burgundy sm:text-xs">
               {firm.legalName} · {firm.city}
             </p>
             {/* Slightly tighter than the global H1 at the narrowest widths, where
@@ -248,7 +248,7 @@ export function Hero() {
           rather than that element. */}
       <div
         ref={mobileBarRef}
-        className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-cream/95 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur lg:hidden"
+        className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-surface/95 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur lg:hidden"
         style={{ opacity: 1 }}
       >
         <CTAButtons layout="bar" />

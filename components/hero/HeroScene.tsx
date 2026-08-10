@@ -42,9 +42,9 @@ function TrackingLights() {
   return (
     <group ref={ref}>
       {/* Key light — warm, high and slightly forward, like a museum spot. */}
-      <directionalLight position={[3, 4, 2.5]} intensity={1.9} color="#fff2dc" />
-      {/* Cool fill from behind-left to separate the bronze from the cream ground. */}
-      <directionalLight position={[-3.5, 1.5, -2]} intensity={0.6} color="#9db8d9" />
+      <directionalLight position={[3, 4, 2.5]} intensity={1.55} color="#fff2dc" />
+      {/* Cool fill from behind-left to separate the bronze from the white ground. */}
+      <directionalLight position={[-3.5, 1.5, -2]} intensity={0.5} color="#9db8d9" />
       {/* Low bounce, as if reflected off the plinth. */}
       <pointLight position={[0, -1.8, 1.6]} intensity={0.28} color="#c9a679" />
     </group>
@@ -58,12 +58,12 @@ export default function HeroScene({ rotationRef, variant = "desktop" }: Props) {
       gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
       camera={{ position: [0, 0, 5], fov: HERO_FOV }}
     >
-      <ambientLight intensity={0.42} />
+      <ambientLight intensity={0.32} />
       <TrackingLights />
 
       <Suspense fallback={null}>
         <StatueModel rotationRef={rotationRef} framing={FRAMING[variant]} />
-        <Environment preset="studio" environmentIntensity={0.55} />
+        <Environment preset="studio" environmentIntensity={0.42} />
       </Suspense>
     </Canvas>
   );

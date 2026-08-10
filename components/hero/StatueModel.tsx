@@ -45,10 +45,13 @@ export function StatueModel({
 
   const { model, offset, radius, height } = useMemo(() => {
     const clone = scene.clone(true);
+    // Deeper and less mirror-like than a brass would be on a dark ground: on a
+    // white page a high-metalness surface reflects the bright environment back
+    // and reads as washed-out pale rather than bronze.
     const material = new THREE.MeshStandardMaterial({
-      color: new THREE.Color("#9a7748"),
-      metalness: 0.78,
-      roughness: 0.34,
+      color: new THREE.Color("#8d6836"),
+      metalness: 0.7,
+      roughness: 0.38,
     });
     clone.traverse((child) => {
       if (child instanceof THREE.Mesh) {

@@ -21,12 +21,12 @@ type Props = {
 export function CTAButtons({ className = "", variant = "light", layout = "stack" }: Props) {
   const primary =
     variant === "dark"
-      ? "bg-cream text-ink hover:bg-white"
-      : "bg-bronze text-cream hover:bg-bronze-deep";
+      ? "bg-surface text-ink hover:bg-sand"
+      : "bg-burgundy text-surface hover:bg-burgundy-deep";
   const secondary =
     variant === "dark"
-      ? "border border-cream/40 text-cream hover:bg-cream/10"
-      : "border border-line bg-cream/70 text-ink hover:border-bronze hover:text-bronze-deep";
+      ? "border border-surface/40 text-surface hover:bg-surface/10"
+      : "border border-line bg-surface/70 text-ink hover:border-burgundy hover:text-burgundy-deep";
 
   const secondaryBase = `min-tap inline-flex items-center justify-center gap-2 rounded-full px-4 py-3 text-sm font-medium transition-colors sm:px-5 ${secondary}`;
 

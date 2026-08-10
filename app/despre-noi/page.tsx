@@ -41,7 +41,7 @@ export default function DespreNoiPage() {
         </div>
       </section>
 
-      <section className="border-t border-line bg-white px-6 py-12 lg:px-16 lg:py-16">
+      <section className="border-t border-line bg-sand px-6 py-12 lg:px-16 lg:py-16">
         <div className="mx-auto max-w-6xl">
           <h2 className="text-2xl lg:text-3xl">Valori și principii</h2>
           <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">

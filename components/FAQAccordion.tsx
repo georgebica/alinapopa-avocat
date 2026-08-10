@@ -27,7 +27,7 @@ export function FAQAccordion({ items }: { items: FaqItem[] }) {
               >
                 <span className="text-base font-medium text-ink">{item.question}</span>
                 <ChevronDownIcon
-                  className={`h-4 w-4 shrink-0 text-bronze transition-transform ${
+                  className={`h-4 w-4 shrink-0 text-burgundy transition-transform ${
                     isOpen ? "rotate-180" : ""
                   }`}
                 />

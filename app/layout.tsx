@@ -49,7 +49,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="ro"
       className={`${fraunces.variable} ${publicSans.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-cream text-ink">
+      <body className="min-h-full flex flex-col bg-surface text-ink">
         <JsonLd data={legalServiceSchema()} />
         <Nav />
         <main className="flex-1">{children}</main>

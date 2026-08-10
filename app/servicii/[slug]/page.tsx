@@ -6,6 +6,7 @@ import { ServiceHero } from "@/components/ServiceHero";
 import { FAQAccordion } from "@/components/FAQAccordion";
 import { CTABanner } from "@/components/CTABanner";
 import { PracticeAreaCard } from "@/components/PracticeAreaCard";
+import { Reveal } from "@/components/Reveal";
 import { ShieldIcon } from "@/components/icons";
 
 type Params = { slug: string };
@@ -62,7 +63,7 @@ export default async function ServicePage({ params }: { params: Promise<Params> 
         </div>
       </section>
 
-      <section className="border-t border-line bg-white px-6 py-12 lg:px-16 lg:py-16">
+      <section className="border-t border-line bg-sand px-6 py-12 lg:px-16 lg:py-16">
         <div className="mx-auto max-w-4xl">
           <h2 className="text-2xl lg:text-3xl">Servicii oferite</h2>
           <dl className="mt-8 grid gap-8 sm:grid-cols-2">
@@ -79,8 +80,8 @@ export default async function ServicePage({ params }: { params: Promise<Params> 
       </section>
 
       <section className="border-t border-line px-6 py-12 lg:px-16 lg:py-16">
-        <div className="mx-auto flex max-w-4xl items-start gap-4 rounded-2xl border border-line bg-cream p-6">
-          <ShieldIcon className="h-6 w-6 shrink-0 text-bronze" />
+        <div className="mx-auto flex max-w-4xl items-start gap-4 rounded-2xl border border-line bg-surface p-6">
+          <ShieldIcon className="h-6 w-6 shrink-0 text-burgundy" />
           <p className="text-sm leading-relaxed text-charcoal-muted">
             Fiecare speță este tratată cu confidențialitate deplină. Consultanța inițială
             presupune o analiză atentă a situației dumneavoastră, pentru identificarea celor mai
@@ -89,7 +90,7 @@ export default async function ServicePage({ params }: { params: Promise<Params> 
         </div>
       </section>
 
-      <section className="border-t border-line bg-white px-6 py-12 lg:px-16 lg:py-16">
+      <section className="border-t border-line bg-sand px-6 py-12 lg:px-16 lg:py-16">
         <FAQAccordion items={service.faq} />
       </section>
 
@@ -98,13 +99,15 @@ export default async function ServicePage({ params }: { params: Promise<Params> 
           <div className="mx-auto max-w-6xl">
             <h2 className="text-2xl lg:text-3xl">Domenii conexe</h2>
             <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {related.map((rel) => (
-                <PracticeAreaCard key={rel.slug} service={rel} />
+              {related.map((rel, index) => (
+                <Reveal key={rel.slug} delay={(index % 3) * 90} className="h-full">
+                  <PracticeAreaCard service={rel} />
+                </Reveal>
               ))}
             </div>
             <Link
               href="/servicii"
-              className="mt-6 inline-block text-sm font-medium text-bronze-deep hover:underline"
+              className="mt-6 inline-block text-sm font-medium text-burgundy-deep hover:underline"
             >
               Vezi toate domeniile de practică →
             </Link>
