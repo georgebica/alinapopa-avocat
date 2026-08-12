@@ -77,12 +77,15 @@ console.log(
     (skipped ? `, ${skipped} already present` : "")
 );
 
-// Verify the statue model survived the export — it is requested at runtime by
-// URL, so a missing file would only show up as an empty hero in production.
-const model = join(OUT_DIR, "models", "statue.glb");
-if (!existsSync(model)) {
-  console.error(`[flatten-rsc] expected ${model} to exist in the export.`);
-  process.exit(1);
+// Verify the models survived the export — both are requested at runtime by URL,
+// so a missing file would only show up in production as an empty hero or an
+// empty closing banner, with nothing failing loudly at build time.
+for (const name of ["statue.glb", "gavel.glb"]) {
+  const model = join(OUT_DIR, "models", name);
+  if (!existsSync(model)) {
+    console.error(`[flatten-rsc] expected ${model} to exist in the export.`);
+    process.exit(1);
+  }
+  const sizeMb = statSync(model).size / 1024 / 1024;
+  console.log(`[flatten-rsc] ${name} present (${sizeMb.toFixed(2)} MB)`);
 }
-const sizeMb = statSync(model).size / 1024 / 1024;
-console.log(`[flatten-rsc] statue.glb present (${sizeMb.toFixed(2)} MB)`);
