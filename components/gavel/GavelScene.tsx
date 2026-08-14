@@ -1,10 +1,11 @@
 "use client";
 
-import { Suspense, useLayoutEffect, useMemo, useRef, type RefObject } from "react";
+import { Suspense, useEffect, useLayoutEffect, useMemo, useRef, type RefObject } from "react";
 import * as THREE from "three";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Environment, Lightformer, useGLTF } from "@react-three/drei";
 import {
+  ARMED,
   LIFT,
   REST,
   STRIKE_POINT,
@@ -58,10 +59,14 @@ export type GavelState = {
   /** Scroll progress through the pinned banner, 0–1. */
   progress: number;
   reducedMotion: boolean;
+  /** Schedules a frame in the canvas's on-demand loop. The scene installs the
+   *  real function once mounted; the banner calls it after each scroll write,
+   *  so the GPU only ever renders when something actually moved. */
+  invalidate: () => void;
 };
 
 export function createGavelState(): GavelState {
-  return { progress: 0, reducedMotion: false };
+  return { progress: 0, reducedMotion: false, invalidate: () => {} };
 }
 
 const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
@@ -160,10 +165,22 @@ function Gavel({ stateRef }: { stateRef: RefObject<GavelState> }) {
     invalidate();
   }, [camera, rig, size.width, size.height, invalidate]);
 
+  // The banner's scroll handler reaches the on-demand loop through the shared
+  // state, so a scroll tick costs one render instead of a running frameloop.
+  useEffect(() => {
+    const state = stateRef.current;
+    state.invalidate = invalidate;
+    return () => {
+      state.invalidate = () => {};
+    };
+  }, [stateRef, invalidate]);
+
   // Seconds since the fall was released; negative while the swing is armed.
   const fall = useRef(-1);
+  // Seeded from ARMED, not REST: the head enters the banner already raised,
+  // and seeding anything lower would play a visible lift at entry.
   const applied = useRef<{ pose: StrikePose; progress: number; shake: number }>({
-    pose: REST,
+    pose: ARMED,
     progress: -1,
     shake: 0,
   });
@@ -245,20 +262,17 @@ function Gavel({ stateRef }: { stateRef: RefObject<GavelState> }) {
   return <primitive object={rig.model} position={rig.centre} />;
 }
 
-export default function GavelScene({
-  stateRef,
-  active,
-}: {
-  stateRef: RefObject<GavelState>;
-  /** Whether the banner is on screen. Off screen the canvas renders on demand
-   *  only, which is effectively never — scroll writes go to the ref and cost
-   *  nothing until the loop is switched back on. */
-  active: boolean;
-}) {
+export default function GavelScene({ stateRef }: { stateRef: RefObject<GavelState> }) {
   return (
+    // Strictly on-demand: the banner invalidates through the state on each
+    // scroll write, and the frame loop invalidates itself while a strike is
+    // still settling. Between those the GPU renders nothing at all — a canvas
+    // running "always" through a pinned scroll was the jank, not the cure.
+    // The dpr cap is modest for the same reason: on a 3x phone the fill cost
+    // of this canvas dwarfs everything else in the section.
     <Canvas
-      frameloop={active ? "always" : "demand"}
-      dpr={[1, 1.75]}
+      frameloop="demand"
+      dpr={[1, 1.5]}
       gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
       camera={{ position: [0, 0, 4], fov: FOV }}
     >

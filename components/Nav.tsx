@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { firm } from "@/content/firm";
 import { services } from "@/content/services";
 import { ChevronDownIcon, CloseIcon, MenuIcon } from "./icons";
+import { PremiumButton } from "./PremiumButton";
 
 const primaryLinks = [
   { href: "/", label: "Acasă" },
@@ -74,12 +75,9 @@ export function Nav() {
           <Link href="/contact" className="text-sm text-ink hover:text-burgundy-deep">
             Contact
           </Link>
-          <Link
-            href="/contact"
-            className="min-tap inline-flex items-center rounded-full bg-burgundy px-5 py-2.5 text-sm font-medium text-surface transition-colors hover:bg-burgundy-deep"
-          >
+          <PremiumButton href="/contact" size="sm">
             Solicită consultație
-          </Link>
+          </PremiumButton>
         </nav>
 
         <button
@@ -147,12 +145,9 @@ export function Nav() {
               Contact
             </Link>
 
-            <Link
-              href="/contact"
-              className="min-tap mt-4 flex items-center justify-center rounded-full bg-burgundy px-5 py-3 text-sm font-medium text-surface hover:bg-burgundy-deep"
-            >
+            <PremiumButton href="/contact" size="sm" className="mt-4 w-full">
               Solicită consultație
-            </Link>
+            </PremiumButton>
           </nav>
         </div>
       )}

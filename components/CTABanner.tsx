@@ -1,11 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import dynamic from "next/dynamic";
-import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
+import { useCallback, useEffect, useRef, type RefObject } from "react";
 import { useMotionValueEvent, useScroll } from "framer-motion";
-import { firm, telLink, whatsappLink, mailtoLink } from "@/content/firm";
-import { PhoneIcon, WhatsAppIcon, MailIcon } from "./icons";
+import { firm } from "@/content/firm";
+import { CTAButtons } from "./CTAButtons";
 import { mapRange } from "./hero/stages";
 import { useMediaQuery } from "@/lib/useMediaQuery";
 import { createGavelState, type GavelState } from "./gavel/GavelScene";
@@ -39,7 +38,7 @@ function Atmosphere({ shaftRef }: { shaftRef?: RefObject<HTMLDivElement | null> 
       {/* One shaft of warm light, falling from upper right onto the gavel. */}
       <div
         ref={shaftRef}
-        className="absolute -top-[25%] right-[2%] h-[150%] w-[38%] -rotate-[16deg] blur-3xl"
+        className="absolute -top-[25%] right-[2%] h-[150%] w-[38%] -rotate-[16deg] blur-3xl will-change-[opacity]"
         style={{
           opacity: 0.09,
           background:
@@ -93,55 +92,6 @@ function SectionDots() {
   );
 }
 
-/** The one decision the page ends on. Champagne against the burgundy dark —
- *  not the white pill the rest of the site uses — with a slow sheen that
- *  crosses the face on hover, the way light travels over brushed metal. */
-function PrimaryCta() {
-  return (
-    <Link
-      href="/contact"
-      className="group relative inline-flex min-tap items-center justify-center overflow-hidden rounded-md border border-[#f6e8cd]/40 bg-gradient-to-b from-[#f8edda] via-[#efdcbc] to-[#e2c9a1] px-8 py-3.5 text-sm font-medium tracking-wide text-burgundy-deep shadow-[0_14px_36px_rgba(0,0,0,0.4)] transition-[transform,box-shadow] duration-300 ease-out hover:-translate-y-0.5 hover:shadow-[0_18px_44px_rgba(185,149,92,0.3)]"
-    >
-      <span
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-y-0 left-0 w-1/2 -translate-x-full -skew-x-12 bg-gradient-to-r from-transparent via-white/50 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-[220%]"
-      />
-      Solicită o consultație
-    </Link>
-  );
-}
-
-/** The three direct channels, deliberately whisper-quiet: small icons, thin
- *  separators, no button chrome. They are footnotes to the consultation CTA,
- *  not competitors to it. */
-function QuietContacts() {
-  const item =
-    "inline-flex min-tap items-center gap-2 text-[13px] tracking-wide text-surface/55 transition-colors hover:text-gold";
-  return (
-    <div className="flex items-center">
-      <a href={telLink()} className={`${item} pr-5`}>
-        <PhoneIcon className="h-3.5 w-3.5 opacity-70" />
-        Sună
-      </a>
-      <span aria-hidden="true" className="h-4 w-px bg-surface/15" />
-      <a
-        href={whatsappLink()}
-        target="_blank"
-        rel="noopener noreferrer"
-        className={`${item} px-5`}
-      >
-        <WhatsAppIcon className="h-3.5 w-3.5 opacity-70" />
-        WhatsApp
-      </a>
-      <span aria-hidden="true" className="h-4 w-px bg-surface/15" />
-      <a href={mailtoLink()} className={`${item} pl-5`}>
-        <MailIcon className="h-3.5 w-3.5 opacity-70" />
-        Email
-      </a>
-    </div>
-  );
-}
-
 /** Eyebrow, headline, supporting line, actions — shared verbatim between the
  *  scrolling scene and the reduced-motion still. */
 function ClosingCopy({
@@ -155,7 +105,7 @@ function ClosingCopy({
     <div
       ref={copyRef}
       style={{ opacity: 1 }}
-      className="flex max-w-xl flex-col items-start gap-6 will-change-[opacity,transform]"
+      className="flex max-w-xl flex-col items-start gap-5 will-change-[opacity,transform] sm:gap-6"
     >
       <p className="text-[11px] font-medium uppercase tracking-[0.32em] text-gold">
         Cabinet de avocat · {firm.city}
@@ -166,13 +116,8 @@ function ClosingCopy({
       <p className="max-w-md text-sm leading-relaxed text-surface/65 sm:text-base">
         {firm.cta.text}
       </p>
-      <div
-        ref={actionsRef}
-        style={{ opacity: 1 }}
-        className="flex flex-col items-start gap-6 will-change-[opacity,transform]"
-      >
-        <PrimaryCta />
-        <QuietContacts />
+      <div ref={actionsRef} style={{ opacity: 1 }} className="w-full will-change-[opacity,transform] sm:w-auto">
+        <CTAButtons variant="dark" />
       </div>
     </div>
   );
@@ -181,20 +126,22 @@ function ClosingCopy({
 /**
  * The closing scene of the site: a pinned scroll sequence, the way the hero is.
  * The section is taller than the screen, its content sticks, and the scrollbar
- * drives the gavel — now framed as a cinematic foreground object, head angled
- * towards the camera, lit hard from one side out of a dark burgundy atmosphere.
+ * drives the gavel — a cinematic foreground object, head angled towards the
+ * camera and already raised, lit hard from one side out of a dark burgundy
+ * atmosphere. Composed for the phone first: the gavel owns the lower half of
+ * the frame beneath the copy, and desktop is the wide-screen recomposition of
+ * that same scene.
  *
- * The choreography: the copy arrives first out of the dark; the gavel rises
- * into the light as the head winds up; crossing the strike point releases the
+ * The choreography: the copy arrives first out of the dark; the gavel descends
+ * into the light with its head armed; crossing the strike point releases the
  * hit (time-based, with rebounds — see `strike.ts` for why the fall is not
  * scrubbed); and the contact actions stamp onto the page with the strike.
  * Scrolling back up re-arms the swing.
  *
  * All scroll-linked styling is written straight to the DOM from one
- * subscription, same as the hero — no React renders per scroll tick. The one
- * piece of real state is `onScreen`, which switches the canvas between its
- * on-demand and continuous loops so the WebGL loop never runs for a banner
- * nobody is looking at.
+ * subscription, same as the hero — no React renders per scroll tick. The
+ * canvas runs a strictly on-demand loop and is invalidated from the same
+ * subscription, so the GPU works only on ticks where something moved.
  */
 export function CTABanner() {
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -203,7 +150,6 @@ export function CTABanner() {
   const shaftRef = useRef<HTMLDivElement>(null);
   const gavelWrapRef = useRef<HTMLDivElement>(null);
   const state = useRef<GavelState>(createGavelState());
-  const [onScreen, setOnScreen] = useState(false);
 
   const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
 
@@ -217,24 +163,18 @@ export function CTABanner() {
     if (reducedMotion) state.current.progress = 0;
   }, [reducedMotion]);
 
-  useEffect(() => {
-    const node = wrapperRef.current;
-    if (!node || reducedMotion) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => setOnScreen(entry.isIntersecting),
-      // A little early, so the first frames of the emergence are never missed.
-      { rootMargin: "120px" }
-    );
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, [reducedMotion]);
-
   const apply = useCallback((progress: number) => {
     state.current.progress = progress;
+    // One render per scroll write. Progress only changes while the section is
+    // inside its scroll window, so this never wakes the canvas for a banner
+    // that is off screen.
+    state.current.invalidate();
 
-    // The copy arrives early, while the gavel is still emerging behind it.
+    // The copy arrives the moment the pin engages, while the gavel is still
+    // descending behind it — the dark entry beat belongs to the atmosphere,
+    // not to an empty screen.
     if (copyRef.current) {
-      const arrive = mapRange(progress, [0.03, 0.2], [0, 1]);
+      const arrive = mapRange(progress, [0, 0.14], [0, 1]);
       copyRef.current.style.opacity = String(arrive);
       copyRef.current.style.transform = `translateY(${(1 - arrive) * 28}px)`;
     }
@@ -252,13 +192,14 @@ export function CTABanner() {
       actionsRef.current.style.pointerEvents = stamped < 0.5 ? "none" : "auto";
     }
 
-    // The gavel emerges from the dark: opacity and a slow rise, finished well
-    // before the wind-up peaks so the strike is watched, not still loading in.
+    // The gavel comes down out of the dark — from above, the same direction
+    // its strike travels — finished well before the release so the strike is
+    // watched, not still loading in.
     if (gavelWrapRef.current) {
-      const emerge = mapRange(progress, [0, 0.28], [0, 1]);
+      const emerge = mapRange(progress, [0, 0.22], [0, 1]);
       gavelWrapRef.current.style.opacity = String(emerge);
-      gavelWrapRef.current.style.transform = `translateY(${(1 - emerge) * 44}px) scale(${
-        0.95 + emerge * 0.05
+      gavelWrapRef.current.style.transform = `translateY(${(1 - emerge) * -40}px) scale(${
+        0.96 + emerge * 0.04
       })`;
     }
 
@@ -289,7 +230,7 @@ export function CTABanner() {
         <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-10 px-6 py-20 sm:px-10 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:gap-14 lg:px-16">
           <ClosingCopy />
           <div aria-hidden="true" className="h-[200px] w-full sm:h-[260px] lg:h-[360px]">
-            <GavelScene stateRef={state} active={false} />
+            <GavelScene stateRef={state} />
           </div>
         </div>
         <SectionDots />
@@ -298,19 +239,20 @@ export function CTABanner() {
   }
 
   return (
-    <section ref={wrapperRef} className="relative" style={{ height: "240vh" }}>
+    <section ref={wrapperRef} className="relative" style={{ height: "200vh" }}>
       <div className="sticky top-16 h-[calc(100svh-4rem)] min-h-[560px] overflow-hidden">
         <Atmosphere shaftRef={shaftRef} />
 
         {/* The gavel layer. Not a grid cell: a foreground object allowed to
-            break the content container — full lower half on a phone, a tall
-            slab bleeding off the right edge on desktop. The outer div owns the
+            break the content container. Sized for the phone first — a large
+            close object filling the lower half of the frame — with desktop as
+            the tall slab bleeding off the right edge. The outer div owns the
             placement transforms so the scroll handler can freely write
             transform on the inner one. Ordered before the copy in the DOM and
             aria-hidden, so it never interrupts the reading order. */}
         <div
           aria-hidden="true"
-          className="absolute bottom-[-7svh] left-1/2 h-[48svh] w-[135%] -translate-x-1/2 sm:h-[56svh] sm:w-[110%] lg:bottom-auto lg:left-auto lg:right-[-7%] lg:top-1/2 lg:h-[92svh] lg:w-[62%] lg:-translate-y-1/2 lg:translate-x-0"
+          className="absolute bottom-[-6svh] left-1/2 h-[56svh] w-[120%] -translate-x-1/2 sm:h-[60svh] sm:w-[105%] lg:bottom-auto lg:left-auto lg:right-[-7%] lg:top-1/2 lg:h-[92svh] lg:w-[62%] lg:-translate-y-1/2 lg:translate-x-0"
         >
           <div
             ref={gavelWrapRef}
@@ -327,14 +269,14 @@ export function CTABanner() {
               }}
             />
             <div className="absolute bottom-[6%] left-1/2 h-[7%] w-[52%] -translate-x-1/2 rounded-[50%] bg-black/40 blur-xl" />
-            <GavelScene stateRef={state} active={onScreen} />
+            <GavelScene stateRef={state} />
           </div>
         </div>
 
         {/* The copy layer, floated over the scene rather than gridded against
-            it: top of the frame on a phone (the gavel owns the lower half),
-            vertically centred on the left on desktop. */}
-        <div className="relative z-10 mx-auto flex h-full w-full max-w-6xl flex-col justify-start px-6 pt-[8svh] sm:px-10 lg:justify-center lg:px-16 lg:pt-0">
+            it: the upper half of the frame on a phone (the gavel owns the
+            lower), vertically centred on the left on desktop. */}
+        <div className="relative z-10 mx-auto flex h-full w-full max-w-6xl flex-col justify-start px-6 pt-[7svh] sm:px-10 lg:justify-center lg:px-16 lg:pt-0">
           <ClosingCopy copyRef={copyRef} actionsRef={actionsRef} />
         </div>
 

@@ -120,7 +120,7 @@ export function Hero() {
     return (
       <section className="relative overflow-hidden border-b border-line bg-surface px-6 py-12">
         <div className="mx-auto flex max-w-3xl flex-col items-center gap-5 text-center">
-          <p className="text-[0.7rem] font-medium uppercase tracking-[0.28em] text-burgundy sm:text-xs">
+          <p className="text-[0.7rem] font-medium uppercase tracking-[0.32em] text-gold-deep sm:text-xs">
             {firm.legalName} · {firm.city}
           </p>
           <h1 className="text-balance text-[1.7rem] leading-[1.15] text-ink sm:text-[2rem] lg:text-[3.5rem]">
@@ -142,7 +142,7 @@ export function Hero() {
             </div>
           </div>
 
-          <CTAButtons className="justify-center" />
+          <CTAButtons className="items-center" />
         </div>
       </section>
     );
@@ -218,7 +218,7 @@ export function Hero() {
             className="flex w-full flex-col items-center gap-3 will-change-[opacity,transform]"
             style={{ opacity: 1 }}
           >
-            <p className="text-[0.7rem] font-medium uppercase tracking-[0.28em] text-burgundy sm:text-xs">
+            <p className="text-[0.7rem] font-medium uppercase tracking-[0.32em] text-gold-deep sm:text-xs">
               {firm.legalName} · {firm.city}
             </p>
             {/* Slightly tighter than the global H1 at the narrowest widths, where
@@ -259,7 +259,7 @@ export function Hero() {
 
             {/* On phones the actions live in the fixed bar below instead, so the
                 scroll sequence never pushes them out of thumb reach. */}
-            <CTAButtons className="hidden justify-center lg:flex" />
+            <CTAButtons className="hidden items-center lg:flex" />
           </div>
         </div>
       </div>

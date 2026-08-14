@@ -28,7 +28,7 @@ export default function Home() {
       <section className="px-6 py-16 lg:px-16 lg:py-24">
         <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[2fr_3fr] lg:gap-16">
           <div>
-            <p className="text-sm font-medium uppercase tracking-[0.2em] text-burgundy">
+            <p className="text-[11px] font-medium uppercase tracking-[0.32em] text-gold-deep sm:text-xs">
               Prezentare
             </p>
             <h2 className="mt-3 text-2xl lg:text-3xl">Cabinet de Avocat Alina Popa</h2>
@@ -52,7 +52,7 @@ export default function Home() {
 
       <section className="border-t border-line bg-sand px-6 py-16 lg:px-16 lg:py-24">
         <div className="mx-auto max-w-6xl">
-          <p className="text-sm font-medium uppercase tracking-[0.2em] text-burgundy">
+          <p className="text-[11px] font-medium uppercase tracking-[0.32em] text-gold-deep sm:text-xs">
             Domenii de practică
           </p>
           <h2 className="mt-3 max-w-2xl text-2xl lg:text-3xl">
@@ -70,7 +70,7 @@ export default function Home() {
 
       <section className="border-t border-line px-6 py-16 lg:px-16 lg:py-24">
         <div className="mx-auto max-w-6xl">
-          <p className="text-sm font-medium uppercase tracking-[0.2em] text-burgundy">
+          <p className="text-[11px] font-medium uppercase tracking-[0.32em] text-gold-deep sm:text-xs">
             Avantaje
           </p>
           <h2 className="mt-3 max-w-2xl text-2xl lg:text-3xl">Valorile cabinetului</h2>
@@ -89,7 +89,7 @@ export default function Home() {
       <section className="border-t border-line px-6 py-16 lg:px-16 lg:py-24">
         <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-2 lg:gap-16">
           <div>
-            <p className="text-sm font-medium uppercase tracking-[0.2em] text-burgundy">Contact</p>
+            <p className="text-[11px] font-medium uppercase tracking-[0.32em] text-gold-deep sm:text-xs">Contact</p>
             <h2 className="mt-3 text-2xl lg:text-3xl">Date de contact</h2>
 
             <ul className="mt-8 flex flex-col gap-5 text-base text-ink">

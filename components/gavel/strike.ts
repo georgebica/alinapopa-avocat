@@ -1,12 +1,14 @@
 /**
  * The gavel's strike, split into two regimes that meet at `STRIKE_POINT`.
  *
- * The wind-up is scrubbed: scroll progress through the pinned banner lifts the
- * head, and scrolling back lowers it again, exactly as the hero's scroll turns
- * the statue. The fall is not scrubbed — a drop that tracked the scrollbar
- * would read as the head being *lowered*, not striking — so crossing the
- * strike point releases a short time-based fall with rebounds, and crossing
- * back above it re-arms the swing for the next pass.
+ * The head is *armed from the first frame*: it enters the banner already
+ * raised, and the whole sequence is a fall from above — never a wind-up off
+ * the block. The scrubbed phase only adds the last of the draw (a slow final
+ * tensioning as the banner is scrolled), and the fall itself is not scrubbed —
+ * a drop that tracked the scrollbar would read as the head being *lowered*,
+ * not striking — so crossing the strike point releases a short time-based fall
+ * with rebounds, and crossing back above it re-arms the swing for the next
+ * pass.
  *
  * `gavel.glb` is baked so the swing needs no offset group: the gavel node's
  * origin sits at the grip, its rest pose is angle 0 with the striking face flat
@@ -19,10 +21,16 @@
  *  watches the head climb, so the climb has to be worth watching. */
 export const LIFT = 0.42;
 
-/** Progress at which the wind-up reaches full lift. The gap from here to the
+/** Progress at which the draw reaches full lift. The gap from here to the
  *  strike point holds the head loaded at the top — scroll travel spent hanging,
  *  which is what makes the release read as a decision rather than an accident. */
 const WINDUP_END = 0.42;
+
+/** Fraction of full lift the head already carries at the top of the sequence.
+ *  High on purpose: the head must read as *raised* from its first visible
+ *  frame, with the scroll adding only the final tensioning, so the motion is
+ *  strictly from above and down — never up off the block first. */
+const ARM_FRACTION = 0.82;
 
 /** Scroll progress at which the fall fires. */
 export const STRIKE_POINT = 0.56;
@@ -55,6 +63,11 @@ export type StrikePose = {
 
 export const REST: StrikePose = { angle: 0, blockY: 0 };
 
+/** The pose the head holds as the banner appears: already raised. The scene
+ *  seeds its animation state from this, so the first rendered frame and the
+ *  scrubbed draw agree and there is no settling dip at entry. */
+export const ARMED: StrikePose = { angle: -LIFT * ARM_FRACTION, blockY: 0 };
+
 const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
 /** Soft at both ends, so the scrubbed lift neither jolts off the block nor
  *  slams into its top stop. */
@@ -63,10 +76,12 @@ const easeInOutCubic = (t: number) =>
 /** Accelerating, like a fall — the head covers most of the arc at the end. */
 const easeInQuad = (t: number) => t * t;
 
-/** The scrubbed wind-up: head angle as a pure function of scroll progress,
- *  valid below the strike point. Reversible by construction. */
+/** The scrubbed draw: head angle as a pure function of scroll progress, valid
+ *  below the strike point. Starts already armed and only adds the final
+ *  tensioning towards full lift. Reversible by construction. */
 export function liftAngle(progress: number): number {
-  return -LIFT * easeInOutCubic(clamp01(progress / WINDUP_END));
+  const draw = easeInOutCubic(clamp01(progress / WINDUP_END));
+  return -LIFT * (ARM_FRACTION + (1 - ARM_FRACTION) * draw);
 }
 
 /** The released strike: pose as a function of seconds since the release. */
