@@ -11,6 +11,19 @@ import { useMediaQuery } from "@/lib/useMediaQuery";
 
 const HeroScene = dynamic(() => import("./hero/HeroScene"), { ssr: false });
 
+// Must match the URL StatueModel's loader will request, byte for byte, or the
+// preload is wasted and the file downloads twice.
+const MODEL_URL = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/models/statue.glb`;
+
+/** Starts the statue GLB download at HTML parse time — it is the heaviest
+ *  asset on the page, and without this it would only begin after hydration,
+ *  when the three.js chunk executes. React hoists the tag into <head>, and
+ *  `crossOrigin="anonymous"` matches the loader's fetch mode so the browser
+ *  reuses the preloaded bytes. */
+function ModelPreload() {
+  return <link rel="preload" as="fetch" crossOrigin="anonymous" href={MODEL_URL} />;
+}
+
 const WATERMARK = "JUSTIȚIE";
 
 const STAGES = [
@@ -119,6 +132,7 @@ export function Hero() {
   if (reducedMotion) {
     return (
       <section className="relative overflow-hidden border-b border-line bg-surface px-6 py-12">
+        <ModelPreload />
         <div className="mx-auto flex max-w-3xl flex-col items-center gap-5 text-center">
           <p className="text-[0.7rem] font-medium uppercase tracking-[0.32em] text-gold-deep sm:text-xs">
             {firm.legalName} · {firm.city}
@@ -154,6 +168,7 @@ export function Hero() {
       className="relative border-b border-line bg-surface"
       style={{ height: "320vh" }}
     >
+      <ModelPreload />
       <div className="sticky top-16 flex h-[calc(100svh-4rem)] min-h-[600px] flex-col overflow-hidden">
         {/* Museum light behind the statue. */}
         <div

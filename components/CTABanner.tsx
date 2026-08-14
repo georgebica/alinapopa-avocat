@@ -14,6 +14,19 @@ import { STRIKE_POINT } from "./gavel/strike";
 // of the page, so the three.js payload should never block the banner rendering.
 const GavelScene = dynamic(() => import("./gavel/GavelScene"), { ssr: false });
 
+// Must match the URL GavelScene's loader will request, byte for byte, or the
+// preload is wasted and the file downloads twice.
+const MODEL_URL = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/models/gavel.glb`;
+
+/** Starts the GLB download at HTML parse time, in parallel with the scripts
+ *  that will eventually consume it — instead of after hydration, when the
+ *  three.js chunk finally executes and asks for it. React hoists the tag into
+ *  <head>, and `crossOrigin="anonymous"` matches the loader's fetch mode so
+ *  the browser reuses the preloaded bytes. */
+function ModelPreload() {
+  return <link rel="preload" as="fetch" crossOrigin="anonymous" href={MODEL_URL} />;
+}
+
 /**
  * The dark stage the whole closing scene plays on. Pure CSS: a burgundy that
  * falls away to near-black at the edges, one volumetric shaft of warm light
@@ -114,22 +127,20 @@ function ClosingCopy({ actionsRef }: { actionsRef?: RefObject<HTMLDivElement | n
 }
 
 /**
- * The closing scene of the site: a pinned scroll sequence, the way the hero is.
- * The section is taller than the screen, its content sticks, and the scrollbar
- * drives the gavel — a cinematic foreground object, head angled towards the
- * camera and already raised, lit hard from one side out of a dark burgundy
- * atmosphere. Composed for the phone first: the gavel owns the lower half of
- * the frame beneath the copy, and desktop is the wide-screen recomposition of
- * that same scene.
+ * The closing scene of the site: a single screen, not a pinned sequence. The
+ * whole performance is driven by the section's *entry* into the viewport —
+ * progress 0 as its top edge appears at the bottom of the screen, 1 the
+ * moment the whole section fits — so the gavel tenses while the scene slides
+ * in and the strike lands exactly as it docks. No scroll is spent standing
+ * still. Composed for the phone first: the gavel owns the lower half of the
+ * frame beneath the copy, and desktop is the wide-screen recomposition.
  *
  * The scene is fully composed from its first visible pixel: copy readable and
- * the gavel already armed while the section is still sliding into view —
- * nothing waits for the pin to engage, because a viewer mid-entry is already
- * looking at it. The scroll then spends its travel on the one event that
- * matters: the head tenses, crossing the strike point releases the hit
- * (time-based, with rebounds — see `strike.ts` for why the fall is not
- * scrubbed), and the contact actions stamp onto the page with the strike.
- * Scrolling back up re-arms the swing.
+ * the gavel already armed mid-entry. The choreography is one event — the head
+ * tenses, crossing the strike point releases the hit (time-based, with
+ * rebounds — see `strike.ts` for why the fall is not scrubbed), and the
+ * contact actions stamp onto the page with the strike. Scrolling back up
+ * re-arms the swing.
  *
  * All scroll-linked styling is written straight to the DOM from one
  * subscription, same as the hero — no React renders per scroll tick. The
@@ -144,9 +155,12 @@ export function CTABanner() {
 
   const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
 
+  // Entry progress: 0 with the section's top at the viewport's bottom edge,
+  // 1 the moment its bottom edge arrives there too — i.e. exactly when the
+  // whole section first fits on screen.
   const { scrollYProgress } = useScroll({
     target: wrapperRef,
-    offset: ["start start", "end end"],
+    offset: ["start end", "end end"],
   });
 
   useEffect(() => {
@@ -165,7 +179,7 @@ export function CTABanner() {
     // Rendered visible for no-JS and reduced-motion readers; this handler is
     // what hides them beforehand.
     if (actionsRef.current) {
-      const stamped = mapRange(progress, [STRIKE_POINT, STRIKE_POINT + 0.1], [0, 1]);
+      const stamped = mapRange(progress, [STRIKE_POINT, STRIKE_POINT + 0.08], [0, 1]);
       actionsRef.current.style.opacity = String(stamped);
       actionsRef.current.style.transform = `translateY(${(1 - stamped) * 16}px) scale(${
         0.94 + stamped * 0.06
@@ -177,7 +191,7 @@ export function CTABanner() {
     // The key light swells towards the strike, then holds.
     if (shaftRef.current) {
       shaftRef.current.style.opacity = String(
-        mapRange(progress, [0.04, STRIKE_POINT], [0.05, 0.16])
+        mapRange(progress, [0.15, STRIKE_POINT], [0.06, 0.16])
       );
     }
   }, []);
@@ -197,6 +211,7 @@ export function CTABanner() {
   if (reducedMotion) {
     return (
       <section className="relative overflow-hidden">
+        <ModelPreload />
         <Atmosphere />
         <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-10 px-6 py-20 sm:px-10 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:gap-14 lg:px-16">
           <ClosingCopy />
@@ -210,44 +225,46 @@ export function CTABanner() {
   }
 
   return (
-    <section ref={wrapperRef} className="relative" style={{ height: "150vh" }}>
-      <div className="sticky top-16 h-[calc(100svh-4rem)] min-h-[560px] overflow-hidden">
-        <Atmosphere shaftRef={shaftRef} />
+    <section
+      ref={wrapperRef}
+      className="relative h-[calc(100svh-4rem)] min-h-[560px] overflow-hidden"
+    >
+      <ModelPreload />
+      <Atmosphere shaftRef={shaftRef} />
 
-        {/* The gavel layer. Not a grid cell: a foreground object allowed to
-            break the content container. Sized for the phone first — a large
-            close object filling the lower half of the frame, pulled up under
-            the copy so the two share the frame instead of splitting it — with
-            desktop as the tall slab bleeding off the right edge. Fully visible
-            from the first pixel of the section; only the strike is animated.
-            Ordered before the copy in the DOM and aria-hidden, so it never
-            interrupts the reading order. */}
+      {/* The gavel layer. Not a grid cell: a foreground object allowed to
+          break the content container. Sized for the phone first — a large
+          close object filling the lower half of the frame, pulled up under
+          the copy so the two share the frame instead of splitting it — with
+          desktop as the tall slab bleeding off the right edge. Fully visible
+          from the first pixel of the section; only the strike is animated.
+          Ordered before the copy in the DOM and aria-hidden, so it never
+          interrupts the reading order. */}
+      <div
+        aria-hidden="true"
+        className="absolute bottom-[-4svh] left-1/2 h-[62svh] w-[120%] -translate-x-1/2 sm:h-[64svh] sm:w-[105%] lg:bottom-auto lg:left-auto lg:right-[-7%] lg:top-1/2 lg:h-[92svh] lg:w-[62%] lg:-translate-y-1/2 lg:translate-x-0"
+      >
+        {/* Brass halo and a diffuse floor pool, so the render sits in lit
+            space on a surface instead of floating on the grade. */}
         <div
-          aria-hidden="true"
-          className="absolute bottom-[-4svh] left-1/2 h-[62svh] w-[120%] -translate-x-1/2 sm:h-[64svh] sm:w-[105%] lg:bottom-auto lg:left-auto lg:right-[-7%] lg:top-1/2 lg:h-[92svh] lg:w-[62%] lg:-translate-y-1/2 lg:translate-x-0"
-        >
-          {/* Brass halo and a diffuse floor pool, so the render sits in lit
-              space on a surface instead of floating on the grade. */}
-          <div
-            className="absolute left-1/2 top-1/2 aspect-square h-[130%] -translate-x-1/2 -translate-y-1/2 rounded-full"
-            style={{
-              background:
-                "radial-gradient(circle, rgba(216,178,124,0.2) 0%, rgba(216,178,124,0.05) 45%, transparent 70%)",
-            }}
-          />
-          <div className="absolute bottom-[6%] left-1/2 h-[7%] w-[52%] -translate-x-1/2 rounded-[50%] bg-black/40 blur-xl" />
-          <GavelScene stateRef={state} />
-        </div>
-
-        {/* The copy layer, floated over the scene rather than gridded against
-            it: the upper half of the frame on a phone (the gavel owns the
-            lower), vertically centred on the left on desktop. */}
-        <div className="relative z-10 mx-auto flex h-full w-full max-w-6xl flex-col justify-start px-6 pt-[6svh] sm:px-10 lg:justify-center lg:px-16 lg:pt-0">
-          <ClosingCopy actionsRef={actionsRef} />
-        </div>
-
-        <SectionDots />
+          className="absolute left-1/2 top-1/2 aspect-square h-[130%] -translate-x-1/2 -translate-y-1/2 rounded-full"
+          style={{
+            background:
+              "radial-gradient(circle, rgba(216,178,124,0.2) 0%, rgba(216,178,124,0.05) 45%, transparent 70%)",
+          }}
+        />
+        <div className="absolute bottom-[6%] left-1/2 h-[7%] w-[52%] -translate-x-1/2 rounded-[50%] bg-black/40 blur-xl" />
+        <GavelScene stateRef={state} />
       </div>
+
+      {/* The copy layer, floated over the scene rather than gridded against
+          it: the upper half of the frame on a phone (the gavel owns the
+          lower), vertically centred on the left on desktop. */}
+      <div className="relative z-10 mx-auto flex h-full w-full max-w-6xl flex-col justify-start px-6 pt-[6svh] sm:px-10 lg:justify-center lg:px-16 lg:pt-0">
+        <ClosingCopy actionsRef={actionsRef} />
+      </div>
+
+      <SectionDots />
     </section>
   );
 }

@@ -1,14 +1,17 @@
 /**
  * The gavel's strike, split into two regimes that meet at `STRIKE_POINT`.
  *
- * The head is *armed from the first frame*: it enters the banner already
+ * Progress here is the banner's *entry* into the viewport — 0 as its top edge
+ * appears at the bottom of the screen, 1 the moment the whole section fits —
+ * so the entire performance plays while the section slides in and is finished
+ * as it docks. The head is armed from the first frame: it enters already
  * raised, and the whole sequence is a fall from above — never a wind-up off
  * the block. The scrubbed phase only adds the last of the draw (a slow final
- * tensioning as the banner is scrolled), and the fall itself is not scrubbed —
- * a drop that tracked the scrollbar would read as the head being *lowered*,
- * not striking — so crossing the strike point releases a short time-based fall
- * with rebounds, and crossing back above it re-arms the swing for the next
- * pass.
+ * tensioning as the section approaches its resting place), and the fall itself
+ * is not scrubbed — a drop that tracked the scrollbar would read as the head
+ * being *lowered*, not striking — so crossing the strike point releases a
+ * short time-based fall with rebounds, and crossing back above it re-arms the
+ * swing for the next pass.
  *
  * `gavel.glb` is baked so the swing needs no offset group: the gavel node's
  * origin sits at the grip, its rest pose is angle 0 with the striking face flat
@@ -22,9 +25,9 @@
 export const LIFT = 0.42;
 
 /** Progress at which the draw reaches full lift. The gap from here to the
- *  strike point holds the head loaded at the top — scroll travel spent hanging,
+ *  strike point holds the head loaded at the top — entry travel spent hanging,
  *  which is what makes the release read as a decision rather than an accident. */
-const WINDUP_END = 0.42;
+const WINDUP_END = 0.72;
 
 /** Fraction of full lift the head already carries at the top of the sequence.
  *  High on purpose: the head must read as *raised* from its first visible
@@ -32,8 +35,11 @@ const WINDUP_END = 0.42;
  *  strictly from above and down — never up off the block first. */
 const ARM_FRACTION = 0.82;
 
-/** Scroll progress at which the fall fires. */
-export const STRIKE_POINT = 0.56;
+/** Entry progress at which the fall fires. Late on purpose: the block is at
+ *  the bottom of the frame and only fully on screen near the end of the
+ *  entry, and the short time-based fall lands the head just as the section
+ *  finishes fitting into the viewport. */
+export const STRIKE_POINT = 0.88;
 
 /** Duration of the released fall, in seconds. Short: the head arrives fast. */
 const FALL_TIME = 0.13;

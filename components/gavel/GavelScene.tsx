@@ -57,7 +57,8 @@ const YAW_DRIFT = 0.12;
 const SHAKE = 0.012;
 
 export type GavelState = {
-  /** Scroll progress through the pinned banner, 0–1. */
+  /** The banner's entry progress, 0–1: how much of the section has scrolled
+   *  into the viewport, 1 the moment the whole section fits. */
   progress: number;
   reducedMotion: boolean;
   /** Schedules a frame in the canvas's on-demand loop. The scene installs the
