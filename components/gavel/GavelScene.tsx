@@ -18,27 +18,38 @@ import {
 // applied by hand — same as the hero statue.
 const MODEL_PATH = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/models/gavel.glb`;
 
-const FOV = 28;
+/** Wide enough that near geometry visibly looms: the cinematic-lens end of
+ *  what the fit maths tolerates, so the head reads as *close*, not just big. */
+const FOV = 34;
 
-/** Three-quarter view: the handle swings towards the viewer rather than lying
- *  flat across the frame, which is what gives the strike its depth. The swing
- *  itself still happens in the model's own XY plane, now seen at an angle. */
-const YAW = -0.44;
+/** The head hangs on the -X side of the grip, so a *positive* yaw swings it
+ *  out of the frame plane towards the camera — head forward, handle receding
+ *  into the scene. The swing itself still happens in the model's own XY
+ *  plane, now watched almost down the line of the handle. */
+const YAW = 0.78;
 
-/** The bench seen from above: the scene is tipped towards the viewer so the
- *  strike is watched looking down onto the block — the judge's own view of it.
- *  Tipping the model rather than pitching the camera keeps the corner-fit
- *  maths below in the camera's own axes. With the default XYZ Euler order the
- *  pitch lands about the world axis after the yaw, so the pair reads as one
- *  camera orbit: around, then up. */
-const PITCH = 0.4;
+/** Tipped towards the viewer, but less steeply than a bench seen from above:
+ *  closer to eye level, which is what makes the object confrontational rather
+ *  than observed. Tipping the model rather than pitching the camera keeps the
+ *  corner-fit maths below in the camera's own axes. With the default XYZ Euler
+ *  order the pitch lands about the world axis after the yaw, so the pair reads
+ *  as one camera orbit: around, then up. */
+const PITCH = 0.3;
 
-/** Slack around the swept silhouette, so nothing grazes the canvas edge. */
-const PADDING = 1.05;
+/** Below 1: the swept silhouette is allowed to graze — even slightly break —
+ *  the canvas edge. The banner composes the gavel as a foreground object that
+ *  escapes its container, so a polite margin would read as timid. */
+const PADDING = 0.94;
 
 /** The camera starts this factor beyond its fitted distance and pushes in as
  *  the head winds up, arriving at the fitted framing exactly at the release. */
-const DOLLY_FROM = 1.1;
+const DOLLY_FROM = 1.16;
+
+/** The scroll also steers the yaw: the model starts this much further turned
+ *  away and comes round to face the viewer as the strike approaches, settling
+ *  at YAW exactly at the release. Small on purpose — the silhouette was fitted
+ *  at YAW, and a subtle turn reads as presence where a sweep reads as gimmick. */
+const YAW_DRIFT = 0.12;
 
 /** Impact tremor, as a fraction of the framed silhouette's height. */
 const SHAKE = 0.012;
@@ -204,12 +215,18 @@ function Gavel({ stateRef }: { stateRef: RefObject<GavelState> }) {
     rigged.gavel.rotation.z = pose.angle;
     rigged.block.position.y = pose.blockY;
 
-    // The slow push-in towards the release point. Z-only, so the lookAt set by
-    // the fit above keeps holding.
-    const dolly = state.reducedMotion
-      ? 1
-      : DOLLY_FROM - (DOLLY_FROM - 1) * easeOutCubic(clamp01(progress / STRIKE_POINT));
-    frame.camera.position.z = fitDistance.current * dolly;
+    // One eased clock for the approach: the camera pushes in and the model
+    // turns to face the viewer on the same curve, so the pair reads as a
+    // single slow move that completes exactly at the release. Reduced motion
+    // holds the finished framing.
+    const approach = state.reducedMotion ? 1 : easeOutCubic(clamp01(progress / STRIKE_POINT));
+
+    // Z-only dolly, so the lookAt set by the fit above keeps holding.
+    frame.camera.position.z = fitDistance.current * (DOLLY_FROM - (DOLLY_FROM - 1) * approach);
+
+    // The reflections shift with this too: turning the model under the fixed
+    // environment sweeps the highlights along the brass as the user scrolls.
+    rigged.model.rotation.y = YAW - YAW_DRIFT * (1 - approach);
 
     // Impact tremor, applied to the model rather than the camera so the fitted
     // lookAt is never disturbed — sideways ring, slight downward thud.
@@ -245,20 +262,28 @@ export default function GavelScene({
       gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
       camera={{ position: [0, 0, 4], fov: FOV }}
     >
-      <ambientLight intensity={0.55} />
-      {/* Warm key from above-right, roughly where the banner's own light would
-          be coming from, and a cool rim to pull the brass off the burgundy. */}
-      <directionalLight position={[2.4, 3.2, 2.6]} intensity={2.1} color="#fff1d8" />
-      <directionalLight position={[-2.8, 1.2, -1.6]} intensity={0.7} color="#c8b6d4" />
+      {/* Single-source cinematic lighting: one hard golden key from the upper
+          right (where the banner's CSS light shaft falls from), a rim from
+          behind the opposite shoulder to cut the silhouette out of the dark,
+          and only a breath of burgundy bounce so the shadow side keeps its
+          form without ever reading as lit. Ambient is close to nothing — the
+          deep side is *meant* to fall away into the grade. */}
+      <ambientLight intensity={0.18} />
+      <directionalLight position={[3.4, 2.8, 2.4]} intensity={3.2} color="#ffdfae" />
+      <directionalLight position={[-1.8, 2.6, -2.8]} intensity={1.5} color="#f3cf9a" />
+      <directionalLight position={[-3.2, 0.4, 1.4]} intensity={0.3} color="#8e3448" />
 
       <Suspense fallback={null}>
         <Gavel stateRef={stateRef} />
         {/* Built from lightformers rather than a preset: metal needs something
-            to reflect, and this avoids the network fetch a preset HDR costs. */}
+            to reflect, and this avoids the network fetch a preset HDR costs.
+            Deliberately lopsided — a tall warm card on the key side, a sliver
+            overhead, and a dim burgundy wall opposite — so the reflections in
+            the brass tell the same one-sided story as the lights. */}
         <Environment resolution={64} frames={1}>
-          <Lightformer intensity={2.6} color="#fff0d5" position={[0, 3, 2]} scale={[6, 3, 1]} />
-          <Lightformer intensity={1.1} color="#ffd7b0" position={[3.5, 0.5, 1]} scale={[3, 4, 1]} />
-          <Lightformer intensity={0.7} color="#8e5a66" position={[-3.5, -1, -1]} scale={[4, 4, 1]} />
+          <Lightformer intensity={3} color="#ffe2b0" position={[3, 2.5, 2]} rotation-y={-0.6} scale={[3.5, 5, 1]} />
+          <Lightformer intensity={1.2} color="#ffd7a0" position={[0, 4, 1]} scale={[7, 1.5, 1]} />
+          <Lightformer intensity={0.4} color="#5c1c2b" position={[-4, -0.5, -1]} scale={[5, 5, 1]} />
         </Environment>
       </Suspense>
     </Canvas>

@@ -100,7 +100,7 @@ export const firm = {
   ],
 
   cta: {
-    title: "Ai nevoie de consultanță juridică?",
+    title: "Aveți nevoie de ajutor juridic?",
     text: "Prezentați-ne situația dumneavoastră și vom analiza împreună pașii juridici care pot fi urmați.",
   },
 } as const;
