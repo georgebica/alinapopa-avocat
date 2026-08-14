@@ -94,19 +94,9 @@ function SectionDots() {
 
 /** Eyebrow, headline, supporting line, actions — shared verbatim between the
  *  scrolling scene and the reduced-motion still. */
-function ClosingCopy({
-  copyRef,
-  actionsRef,
-}: {
-  copyRef?: RefObject<HTMLDivElement | null>;
-  actionsRef?: RefObject<HTMLDivElement | null>;
-}) {
+function ClosingCopy({ actionsRef }: { actionsRef?: RefObject<HTMLDivElement | null> }) {
   return (
-    <div
-      ref={copyRef}
-      style={{ opacity: 1 }}
-      className="flex max-w-xl flex-col items-start gap-5 will-change-[opacity,transform] sm:gap-6"
-    >
+    <div className="flex max-w-xl flex-col items-start gap-5 sm:gap-6">
       <p className="text-[11px] font-medium uppercase tracking-[0.32em] text-gold">
         Cabinet de avocat · {firm.city}
       </p>
@@ -132,10 +122,13 @@ function ClosingCopy({
  * the frame beneath the copy, and desktop is the wide-screen recomposition of
  * that same scene.
  *
- * The choreography: the copy arrives first out of the dark; the gavel descends
- * into the light with its head armed; crossing the strike point releases the
- * hit (time-based, with rebounds — see `strike.ts` for why the fall is not
- * scrubbed); and the contact actions stamp onto the page with the strike.
+ * The scene is fully composed from its first visible pixel: copy readable and
+ * the gavel already armed while the section is still sliding into view —
+ * nothing waits for the pin to engage, because a viewer mid-entry is already
+ * looking at it. The scroll then spends its travel on the one event that
+ * matters: the head tenses, crossing the strike point releases the hit
+ * (time-based, with rebounds — see `strike.ts` for why the fall is not
+ * scrubbed), and the contact actions stamp onto the page with the strike.
  * Scrolling back up re-arms the swing.
  *
  * All scroll-linked styling is written straight to the DOM from one
@@ -145,10 +138,8 @@ function ClosingCopy({
  */
 export function CTABanner() {
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const copyRef = useRef<HTMLDivElement>(null);
   const actionsRef = useRef<HTMLDivElement>(null);
   const shaftRef = useRef<HTMLDivElement>(null);
-  const gavelWrapRef = useRef<HTMLDivElement>(null);
   const state = useRef<GavelState>(createGavelState());
 
   const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
@@ -170,15 +161,6 @@ export function CTABanner() {
     // that is off screen.
     state.current.invalidate();
 
-    // The copy arrives the moment the pin engages, while the gavel is still
-    // descending behind it — the dark entry beat belongs to the atmosphere,
-    // not to an empty screen.
-    if (copyRef.current) {
-      const arrive = mapRange(progress, [0, 0.14], [0, 1]);
-      copyRef.current.style.opacity = String(arrive);
-      copyRef.current.style.transform = `translateY(${(1 - arrive) * 28}px)`;
-    }
-
     // The actions are what the strike delivers: they stamp in with the hit.
     // Rendered visible for no-JS and reduced-motion readers; this handler is
     // what hides them beforehand.
@@ -190,17 +172,6 @@ export function CTABanner() {
       })`;
       // Invisible buttons must not swallow taps meant for the page.
       actionsRef.current.style.pointerEvents = stamped < 0.5 ? "none" : "auto";
-    }
-
-    // The gavel comes down out of the dark — from above, the same direction
-    // its strike travels — finished well before the release so the strike is
-    // watched, not still loading in.
-    if (gavelWrapRef.current) {
-      const emerge = mapRange(progress, [0, 0.22], [0, 1]);
-      gavelWrapRef.current.style.opacity = String(emerge);
-      gavelWrapRef.current.style.transform = `translateY(${(1 - emerge) * -40}px) scale(${
-        0.96 + emerge * 0.04
-      })`;
     }
 
     // The key light swells towards the strike, then holds.
@@ -239,45 +210,40 @@ export function CTABanner() {
   }
 
   return (
-    <section ref={wrapperRef} className="relative" style={{ height: "200vh" }}>
+    <section ref={wrapperRef} className="relative" style={{ height: "150vh" }}>
       <div className="sticky top-16 h-[calc(100svh-4rem)] min-h-[560px] overflow-hidden">
         <Atmosphere shaftRef={shaftRef} />
 
         {/* The gavel layer. Not a grid cell: a foreground object allowed to
             break the content container. Sized for the phone first — a large
-            close object filling the lower half of the frame — with desktop as
-            the tall slab bleeding off the right edge. The outer div owns the
-            placement transforms so the scroll handler can freely write
-            transform on the inner one. Ordered before the copy in the DOM and
-            aria-hidden, so it never interrupts the reading order. */}
+            close object filling the lower half of the frame, pulled up under
+            the copy so the two share the frame instead of splitting it — with
+            desktop as the tall slab bleeding off the right edge. Fully visible
+            from the first pixel of the section; only the strike is animated.
+            Ordered before the copy in the DOM and aria-hidden, so it never
+            interrupts the reading order. */}
         <div
           aria-hidden="true"
-          className="absolute bottom-[-6svh] left-1/2 h-[56svh] w-[120%] -translate-x-1/2 sm:h-[60svh] sm:w-[105%] lg:bottom-auto lg:left-auto lg:right-[-7%] lg:top-1/2 lg:h-[92svh] lg:w-[62%] lg:-translate-y-1/2 lg:translate-x-0"
+          className="absolute bottom-[-4svh] left-1/2 h-[62svh] w-[120%] -translate-x-1/2 sm:h-[64svh] sm:w-[105%] lg:bottom-auto lg:left-auto lg:right-[-7%] lg:top-1/2 lg:h-[92svh] lg:w-[62%] lg:-translate-y-1/2 lg:translate-x-0"
         >
+          {/* Brass halo and a diffuse floor pool, so the render sits in lit
+              space on a surface instead of floating on the grade. */}
           <div
-            ref={gavelWrapRef}
-            style={{ opacity: 0 }}
-            className="relative h-full w-full will-change-[opacity,transform]"
-          >
-            {/* Brass halo and a diffuse floor pool, so the render sits in lit
-                space on a surface instead of floating on the grade. */}
-            <div
-              className="absolute left-1/2 top-1/2 aspect-square h-[130%] -translate-x-1/2 -translate-y-1/2 rounded-full"
-              style={{
-                background:
-                  "radial-gradient(circle, rgba(216,178,124,0.2) 0%, rgba(216,178,124,0.05) 45%, transparent 70%)",
-              }}
-            />
-            <div className="absolute bottom-[6%] left-1/2 h-[7%] w-[52%] -translate-x-1/2 rounded-[50%] bg-black/40 blur-xl" />
-            <GavelScene stateRef={state} />
-          </div>
+            className="absolute left-1/2 top-1/2 aspect-square h-[130%] -translate-x-1/2 -translate-y-1/2 rounded-full"
+            style={{
+              background:
+                "radial-gradient(circle, rgba(216,178,124,0.2) 0%, rgba(216,178,124,0.05) 45%, transparent 70%)",
+            }}
+          />
+          <div className="absolute bottom-[6%] left-1/2 h-[7%] w-[52%] -translate-x-1/2 rounded-[50%] bg-black/40 blur-xl" />
+          <GavelScene stateRef={state} />
         </div>
 
         {/* The copy layer, floated over the scene rather than gridded against
             it: the upper half of the frame on a phone (the gavel owns the
             lower), vertically centred on the left on desktop. */}
-        <div className="relative z-10 mx-auto flex h-full w-full max-w-6xl flex-col justify-start px-6 pt-[7svh] sm:px-10 lg:justify-center lg:px-16 lg:pt-0">
-          <ClosingCopy copyRef={copyRef} actionsRef={actionsRef} />
+        <div className="relative z-10 mx-auto flex h-full w-full max-w-6xl flex-col justify-start px-6 pt-[6svh] sm:px-10 lg:justify-center lg:px-16 lg:pt-0">
+          <ClosingCopy actionsRef={actionsRef} />
         </div>
 
         <SectionDots />

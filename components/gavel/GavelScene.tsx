@@ -39,8 +39,9 @@ const PITCH = 0.3;
 
 /** Below 1: the swept silhouette is allowed to graze — even slightly break —
  *  the canvas edge. The banner composes the gavel as a foreground object that
- *  escapes its container, so a polite margin would read as timid. */
-const PADDING = 0.94;
+ *  escapes its container, so a polite margin would read as timid. It also
+ *  tightens the dead air the swing arc reserves above the resting head. */
+const PADDING = 0.9;
 
 /** The camera starts this factor beyond its fitted distance and pushes in as
  *  the head winds up, arriving at the fitted framing exactly at the release. */
