@@ -11,17 +11,23 @@ import { useMediaQuery } from "@/lib/useMediaQuery";
 
 const HeroScene = dynamic(() => import("./hero/HeroScene"), { ssr: false });
 
-// Must match the URL StatueModel's loader will request, byte for byte, or the
-// preload is wasted and the file downloads twice.
+// Must match the URLs the scene's loaders will request, byte for byte, or the
+// preload is wasted and the files download twice.
 const MODEL_URL = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/models/statue.glb`;
+const ENV_URL = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/models/studio_small_03_1k.hdr`;
 
-/** Starts the statue GLB download at HTML parse time — it is the heaviest
- *  asset on the page, and without this it would only begin after hydration,
- *  when the three.js chunk executes. React hoists the tag into <head>, and
- *  `crossOrigin="anonymous"` matches the loader's fetch mode so the browser
- *  reuses the preloaded bytes. */
+/** Starts the statue GLB and its studio HDR downloading at HTML parse time —
+ *  they are the heaviest assets on the page, and without this they would only
+ *  begin after hydration, when the three.js chunk executes. React hoists the
+ *  tags into <head>, and `crossOrigin="anonymous"` matches the loaders' fetch
+ *  mode so the browser reuses the preloaded bytes. */
 function ModelPreload() {
-  return <link rel="preload" as="fetch" crossOrigin="anonymous" href={MODEL_URL} />;
+  return (
+    <>
+      <link rel="preload" as="fetch" crossOrigin="anonymous" href={MODEL_URL} />
+      <link rel="preload" as="fetch" crossOrigin="anonymous" href={ENV_URL} />
+    </>
+  );
 }
 
 const WATERMARK = "JUSTIȚIE";

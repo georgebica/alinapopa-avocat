@@ -4,6 +4,7 @@ import { Suspense, useEffect, useLayoutEffect, useMemo, useRef, type RefObject }
 import * as THREE from "three";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Environment, Lightformer, useGLTF } from "@react-three/drei";
+import { SceneBoundary } from "../SceneBoundary";
 import {
   ARMED,
   LIFT,
@@ -272,6 +273,7 @@ export default function GavelScene({ stateRef }: { stateRef: RefObject<GavelStat
     // running "always" through a pinned scroll was the jank, not the cure.
     // The dpr cap is modest for the same reason: on a 3x phone the fill cost
     // of this canvas dwarfs everything else in the section.
+    <SceneBoundary>
     <Canvas
       frameloop="demand"
       dpr={[1, 1.5]}
@@ -303,6 +305,7 @@ export default function GavelScene({ stateRef }: { stateRef: RefObject<GavelStat
         </Environment>
       </Suspense>
     </Canvas>
+    </SceneBoundary>
   );
 }
 

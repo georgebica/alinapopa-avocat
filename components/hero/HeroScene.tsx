@@ -6,6 +6,15 @@ import { Suspense, useRef, type RefObject } from "react";
 import * as THREE from "three";
 import { StatueModel, HERO_FOV, type Framing } from "./StatueModel";
 import type { RotationState } from "./rotationState";
+import { SceneBoundary } from "../SceneBoundary";
+
+/**
+ * Self-hosted studio HDR. The drei `preset` variant fetches this same file
+ * from raw.githubusercontent.com at runtime — a third-party CDN that
+ * rate-limits (429), and the failed load took the whole site down with it.
+ * Served from our own origin it is cacheable, reliable, and preloadable.
+ */
+const ENV_URL = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/models/studio_small_03_1k.hdr`;
 
 type Variant = "desktop" | "mobile" | "static";
 
@@ -53,18 +62,27 @@ function TrackingLights() {
 
 export default function HeroScene({ rotationRef, variant = "desktop" }: Props) {
   return (
-    <Canvas
-      dpr={[1, 1.75]}
-      gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
-      camera={{ position: [0, 0, 5], fov: HERO_FOV }}
-    >
-      <ambientLight intensity={0.32} />
-      <TrackingLights />
+    <SceneBoundary>
+      <Canvas
+        dpr={[1, 1.75]}
+        gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
+        camera={{ position: [0, 0, 5], fov: HERO_FOV }}
+      >
+        <ambientLight intensity={0.32} />
+        <TrackingLights />
 
-      <Suspense fallback={null}>
-        <StatueModel rotationRef={rotationRef} framing={FRAMING[variant]} />
-        <Environment preset="studio" environmentIntensity={0.42} />
-      </Suspense>
-    </Canvas>
+        <Suspense fallback={null}>
+          <StatueModel rotationRef={rotationRef} framing={FRAMING[variant]} />
+          {/* Its own boundary: if the HDR ever fails to load, the statue
+              stays — just without image-based reflections — instead of the
+              error costing the entire scene. */}
+          <SceneBoundary>
+            <Suspense fallback={null}>
+              <Environment files={ENV_URL} environmentIntensity={0.42} />
+            </Suspense>
+          </SceneBoundary>
+        </Suspense>
+      </Canvas>
+    </SceneBoundary>
   );
 }
