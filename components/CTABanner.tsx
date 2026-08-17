@@ -36,6 +36,20 @@ const DOCK_DURATION = 450;
 
 const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
 
+/**
+ * Timed-strike draft: the performance is played by a clock, not the
+ * scrollbar. The gavel holds its armed pose while the scene is read; once
+ * PLAY_VISIBILITY of the section is on screen, a PLAY_DELAY countdown runs,
+ * and then the entire approach — dolly, turn, final draw, release, stamped
+ * actions — plays over PLAY_DURATION by driving the same progress value the
+ * scroll used to. One performance per visit: it never re-arms.
+ */
+const PLAY_VISIBILITY = 0.45;
+const PLAY_DELAY = 1200;
+const PLAY_DURATION = 2200;
+
+const easeInOutSine = (t: number) => -(Math.cos(Math.PI * t) - 1) / 2;
+
 /** The page carries `scroll-behavior: smooth` (globals.css), which would turn
  *  every per-frame `scrollTo` into its own browser-driven smooth animation —
  *  the two animations fight and the glide turns to rubber. Each write must be
@@ -154,12 +168,13 @@ function ClosingCopy({ actionsRef }: { actionsRef?: RefObject<HTMLDivElement | n
 }
 
 /**
- * The closing scene of the site: a single screen, not a pinned sequence. The
- * whole performance is driven by the section's *entry* into the viewport —
- * progress 0 as its top edge appears at the bottom of the screen, 1 the
- * moment the whole section fits — so the gavel tenses while the scene slides
- * in and the strike lands exactly as it docks. No scroll is spent standing
- * still. Composed for the phone first: the gavel owns the lower half of the
+ * The closing scene of the site — timed-strike draft. The gavel is fixed:
+ * scrolling neither scrubs nor re-arms it. Once most of the section is on
+ * screen, a short pause runs and the whole performance — camera push-in,
+ * final draw, release, stamped actions — plays itself exactly once, driven
+ * by a clock through the same progress value the scroll version scrubbed.
+ * The docking assist is kept, so the section still lands fully in view.
+ * Composed for the phone first: the gavel owns the lower half of the
  * frame beneath the copy, and desktop is the wide-screen recomposition.
  *
  * The scene is fully composed from its first visible pixel: copy readable and
@@ -300,9 +315,10 @@ export function CTABanner() {
     []
   );
 
+  // The scroll drives only the docking assist in this draft — the gavel no
+  // longer reads the scrollbar at all.
   useMotionValueEvent(scrollYProgress, "change", (progress) => {
     if (reducedMotion) return;
-    apply(progress);
 
     const prev = prevProgress.current;
     prevProgress.current = progress;
@@ -317,16 +333,54 @@ export function CTABanner() {
     }
   });
 
-  // A reload part-way down the page lands mid-sequence: seed every scroll-linked
-  // style from the real position rather than waiting for the first scroll event.
-  // The direction tracker is seeded too, or the first upward scroll after such
-  // a reload would read as downward and fire the docking assist.
+  // The one-shot performance. Watching visibility rather than firing on mount
+  // means the pause is counted from when the viewer can actually see the
+  // stage; the `played` flag survives scrolling away and back, so the strike
+  // lands exactly once per visit.
   useEffect(() => {
     if (reducedMotion) return;
-    const progress = scrollYProgress.get();
-    prevProgress.current = progress;
-    if (progress >= 1) docked.current = true;
-    apply(progress);
+    const wrapper = wrapperRef.current;
+    if (!wrapper) return;
+
+    let raf = 0;
+    let timer: number | undefined;
+    let played = false;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (played || entry.intersectionRatio < PLAY_VISIBILITY) continue;
+          played = true;
+          observer.disconnect();
+          timer = window.setTimeout(() => {
+            const start = performance.now();
+            const step = (now: number) => {
+              const t = Math.min(1, (now - start) / PLAY_DURATION);
+              apply(easeInOutSine(t));
+              if (t < 1) raf = requestAnimationFrame(step);
+            };
+            raf = requestAnimationFrame(step);
+          }, PLAY_DELAY);
+        }
+      },
+      { threshold: PLAY_VISIBILITY }
+    );
+    observer.observe(wrapper);
+    return () => {
+      observer.disconnect();
+      window.clearTimeout(timer);
+      cancelAnimationFrame(raf);
+    };
+  }, [reducedMotion, apply]);
+
+  // Seed the scene at rest: armed gavel, hidden actions, dim shaft. The dock
+  // tracker still reads the real scroll position so a mid-page reload cannot
+  // misfire the assist; the performance itself waits for the observer above.
+  useEffect(() => {
+    if (reducedMotion) return;
+    prevProgress.current = scrollYProgress.get();
+    if (prevProgress.current >= 1) docked.current = true;
+    apply(0);
   }, [reducedMotion, scrollYProgress, apply]);
 
   // Reduced motion gets a calm single screen: the same graded atmosphere, the
