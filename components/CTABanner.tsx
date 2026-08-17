@@ -14,9 +14,11 @@ import { STRIKE_POINT } from "./gavel/strike";
 // of the page, so the three.js payload should never block the banner rendering.
 const GavelScene = dynamic(() => import("./gavel/GavelScene"), { ssr: false });
 
-// Must match the URL GavelScene's loader will request, byte for byte, or the
-// preload is wasted and the file downloads twice.
-const MODEL_URL = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/models/gavel.glb`;
+// No <link rel="preload"> for the gavel model here on purpose: this banner
+// sits at the foot of every page, so a head-level preload forced its 270KB
+// onto each page view ahead of critical-path resources. GavelScene's own
+// `useGLTF.preload` starts the download when its chunk executes, which is
+// still long before the banner scrolls into view.
 
 /** Entry progress at which the page takes the scroll over and docks the scene
  *  itself. Just below the strike point, so the assisted glide is what carries
@@ -43,14 +45,6 @@ const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
 const jumpTo = (top: number) =>
   window.scrollTo({ top, behavior: "instant" as ScrollBehavior });
 
-/** Starts the GLB download at HTML parse time, in parallel with the scripts
- *  that will eventually consume it — instead of after hydration, when the
- *  three.js chunk finally executes and asks for it. React hoists the tag into
- *  <head>, and `crossOrigin="anonymous"` matches the loader's fetch mode so
- *  the browser reuses the preloaded bytes. */
-function ModelPreload() {
-  return <link rel="preload" as="fetch" crossOrigin="anonymous" href={MODEL_URL} />;
-}
 
 /**
  * The dark stage the whole closing scene plays on. Pure CSS: a burgundy that
@@ -334,7 +328,6 @@ export function CTABanner() {
   if (reducedMotion) {
     return (
       <section className="relative overflow-hidden">
-        <ModelPreload />
         <Atmosphere />
         <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-10 px-6 py-20 sm:px-10 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:gap-14 lg:px-16">
           <ClosingCopy />
@@ -352,7 +345,6 @@ export function CTABanner() {
       ref={wrapperRef}
       className="relative h-[calc(100svh-4rem)] min-h-[560px] overflow-hidden"
     >
-      <ModelPreload />
       <Atmosphere shaftRef={shaftRef} />
 
       {/* The gavel layer. Not a grid cell: a foreground object allowed to

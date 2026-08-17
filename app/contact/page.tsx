@@ -8,6 +8,7 @@ export const metadata: Metadata = {
   title: "Contact",
   description: `Contactați Cabinetul de Avocat Alina Popa din ${firm.city}. Telefon: ${firm.phoneDisplay}, email: ${firm.email}.`,
   alternates: { canonical: "/contact" },
+  openGraph: { url: "/contact" },
 };
 
 const CONSULTATION_SUBJECT = "Solicitare consultație juridică";

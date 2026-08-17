@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   title: "Termeni și condiții",
   description: `Termenii și condițiile de utilizare a site-ului ${firm.legalName}.`,
   alternates: { canonical: "/termeni-si-conditii" },
+  openGraph: { url: "/termeni-si-conditii" },
   robots: { index: false, follow: true },
 };
 

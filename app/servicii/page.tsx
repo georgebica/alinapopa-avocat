@@ -10,6 +10,7 @@ export const metadata: Metadata = {
   description:
     "Consultanță juridică și reprezentare în litigii, în cele 9 domenii de practică ale Cabinetului de Avocat Alina Popa din Timișoara.",
   alternates: { canonical: "/servicii" },
+  openGraph: { url: "/servicii" },
 };
 
 export default function ServiciiPage() {

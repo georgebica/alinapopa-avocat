@@ -4,16 +4,21 @@ import { ServiceHero } from "@/components/ServiceHero";
 import { ValueCard } from "@/components/ValueCard";
 import { ConfidentialityBlock } from "@/components/ConfidentialityBlock";
 import { CTABanner } from "@/components/CTABanner";
+import { JsonLd, personSchema } from "@/lib/schema";
 
 export const metadata: Metadata = {
   title: "Despre noi",
   description: `Istoricul Cabinetului de Avocat Alina Popa, fondat în ${firm.founded}, membru al ${firm.barGenitive}. Peste ${firm.yearsOfExperience} ani de experiență în Timișoara.`,
   alternates: { canonical: "/despre-noi" },
+  openGraph: { url: "/despre-noi" },
 };
 
 export default function DespreNoiPage() {
   return (
     <>
+      {/* The attorney as a Person entity — the organization's `founder`
+          reference on every page resolves here. */}
+      <JsonLd data={personSchema()} />
       <ServiceHero title="Despre noi" crumbs={[{ name: "Despre noi", url: "/despre-noi" }]} />
 
       <section className="px-6 py-12 lg:px-16 lg:py-16">

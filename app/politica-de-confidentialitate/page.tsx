@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   title: "Politica de confidențialitate",
   description: `Politica de confidențialitate a ${firm.legalName} privind prelucrarea datelor cu caracter personal.`,
   alternates: { canonical: "/politica-de-confidentialitate" },
+  openGraph: { url: "/politica-de-confidentialitate" },
   robots: { index: false, follow: true },
 };
 

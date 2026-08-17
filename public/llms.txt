@@ -1,0 +1,33 @@
+# Alina Popa – Cabinet de Avocat
+
+> Cabinet de avocatură înființat în 2009, membru al Baroului Timiș, cu sediul
+> în Timișoara, Strada Gheorghe Lazăr 32. Oferă consultanță juridică și
+> reprezentare în instanță pentru persoane fizice și juridice, în peste
+> 15 ani de activitate.
+
+Contact: +40731404748 | avocatgorganalina@yahoo.com
+Website: https://georgebica.github.io/alinapopa-avocat/
+
+## Pagini principale
+
+- [Acasă](https://georgebica.github.io/alinapopa-avocat/): Prezentarea cabinetului, valorile și domeniile de practică ale Cabinetului de Avocat Alina Popa din Timișoara.
+- [Despre noi](https://georgebica.github.io/alinapopa-avocat/despre-noi/): Istoricul cabinetului, apartenența la Baroul Timiș și principiile de confidențialitate ale relației avocat-client.
+- [Contact](https://georgebica.github.io/alinapopa-avocat/contact/): Date de contact, adresă și program al Cabinetului de Avocat Alina Popa.
+
+## Servicii juridice
+
+- [Servicii](https://georgebica.github.io/alinapopa-avocat/servicii/): Lista completă a domeniilor de practică juridică oferite.
+- [Drept civil și dreptul familiei](https://georgebica.github.io/alinapopa-avocat/servicii/drept-civil-si-dreptul-familiei/): Divorț, partaj, custodie, moștenire și succesiune.
+- [Dreptul muncii](https://georgebica.github.io/alinapopa-avocat/servicii/dreptul-muncii/): Concedieri, conflicte de muncă, accidente de muncă și pensii, pentru angajați și angajatori.
+- [Drept comercial și afaceri](https://georgebica.github.io/alinapopa-avocat/servicii/drept-comercial-si-afaceri/): Consultanță și reprezentare pentru societăți comerciale și raporturi contractuale.
+- [Drept fiscal și administrativ](https://georgebica.github.io/alinapopa-avocat/servicii/drept-fiscal-si-administrativ/): Litigii fiscale și contestații administrativ-fiscale.
+- [Executări silite și recuperare creanțe](https://georgebica.github.io/alinapopa-avocat/servicii/executari-silite-si-recuperare-creante/): Contestații la executare și recuperare de creanțe.
+- [Dreptul asigurărilor și accidente rutiere](https://georgebica.github.io/alinapopa-avocat/servicii/dreptul-asigurarilor-si-accidente-rutiere/): Daune materiale și morale rezultate din accidente rutiere.
+- [Drept contravențional](https://georgebica.github.io/alinapopa-avocat/servicii/drept-contraventional/): Contestarea proceselor-verbale de contravenție.
+- [Drept bancar și insolvență](https://georgebica.github.io/alinapopa-avocat/servicii/drept-bancar-si-insolventa/): Litigii bancare și proceduri de insolvență.
+- [Proprietate intelectuală](https://georgebica.github.io/alinapopa-avocat/servicii/proprietate-intelectuala/): Protecția drepturilor de proprietate intelectuală.
+
+## Legal
+
+- [Politica de confidențialitate](https://georgebica.github.io/alinapopa-avocat/politica-de-confidentialitate/): Modul de prelucrare a datelor cu caracter personal.
+- [Termeni și condiții](https://georgebica.github.io/alinapopa-avocat/termeni-si-conditii/): Condițiile de utilizare a site-ului.

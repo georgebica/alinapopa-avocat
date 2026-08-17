@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getServiceBySlug, getRelatedServices, services } from "@/content/services";
+import { JsonLd, serviceSchema } from "@/lib/schema";
 import { ServiceHero } from "@/components/ServiceHero";
 import { FAQAccordion } from "@/components/FAQAccordion";
 import { CTABanner } from "@/components/CTABanner";
@@ -45,6 +46,9 @@ export default async function ServicePage({ params }: { params: Promise<Params> 
 
   return (
     <>
+      {/* The practice area as a Service tied to the organization, with its
+          sub-services as the offer catalog. */}
+      <JsonLd data={serviceSchema(service)} />
       <ServiceHero
         title={service.title}
         crumbs={[

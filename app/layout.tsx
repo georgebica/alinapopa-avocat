@@ -1,9 +1,9 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Fraunces, Public_Sans } from "next/font/google";
 import "./globals.css";
 import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
-import { JsonLd, legalServiceSchema } from "@/lib/schema";
+import { JsonLd, legalServiceSchema, websiteSchema } from "@/lib/schema";
 import { firm, siteUrl } from "@/content/firm";
 
 const fraunces = Fraunces({
@@ -41,6 +41,14 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  // A static file in public/ rather than an app/manifest.ts route: the
+  // dynamic manifest route does not survive `output: "export"` page-data
+  // collection, and a plain JSON asset behaves identically.
+  manifest: "/manifest.webmanifest",
+};
+
+export const viewport: Viewport = {
+  themeColor: "#7c1d2e",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -51,6 +59,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col bg-surface text-ink">
         <JsonLd data={legalServiceSchema()} />
+        <JsonLd data={websiteSchema()} />
         <Nav />
         <main className="flex-1">{children}</main>
         <Footer />

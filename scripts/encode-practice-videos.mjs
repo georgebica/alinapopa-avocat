@@ -58,7 +58,7 @@ const CLIPS = {
   "drept-civil-si-dreptul-familiei": "dreptcivil.mp4",
   "dreptul-muncii": "dreptulmuncii.mp4",
   "executari-silite-si-recuperare-creante": "executarisilite.mp4",
-  "dreptul-asigurarilor-si-accidente-rutiere": "dreptauto.mp4",
+  "dreptul-asigurarilor-si-accidente-rutiere": "Miniature_car_protected_by_shield_202608172123.mp4",
   "drept-contraventional": "dreptcontraventional.mp4",
   "drept-bancar-si-insolventa": "dreptbancar.mp4",
   // Straight off the generator, name and all.

@@ -16,6 +16,7 @@ export const metadata: Metadata = {
   title: `${firm.legalName} | Avocat Timișoara`,
   description: `${firm.positioning} Cabinet de avocatură fondat în ${firm.founded}, membru al ${firm.barGenitive}. Consultanță juridică și reprezentare în litigii.`,
   alternates: { canonical: "/" },
+  openGraph: { url: "/" },
 };
 
 export default function Home() {

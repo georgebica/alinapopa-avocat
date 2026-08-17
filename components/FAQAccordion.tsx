@@ -19,19 +19,24 @@ export function FAQAccordion({ items }: { items: FaqItem[] }) {
           const isOpen = openIndex === index;
           return (
             <div key={item.question}>
-              <button
-                type="button"
-                onClick={() => setOpenIndex(isOpen ? null : index)}
-                aria-expanded={isOpen}
-                className="min-tap flex w-full items-center justify-between gap-4 py-4 text-left"
-              >
-                <span className="text-base font-medium text-ink">{item.question}</span>
-                <ChevronDownIcon
-                  className={`h-4 w-4 shrink-0 text-burgundy transition-transform ${
-                    isOpen ? "rotate-180" : ""
-                  }`}
-                />
-              </button>
+              {/* The question is a real heading wrapping the trigger, so the
+                  question text is crawlable document structure — search and
+                  AI engines read it from the markup, not only the JSON-LD. */}
+              <h3 className="font-sans text-base font-medium tracking-normal">
+                <button
+                  type="button"
+                  onClick={() => setOpenIndex(isOpen ? null : index)}
+                  aria-expanded={isOpen}
+                  className="min-tap flex w-full items-center justify-between gap-4 py-4 text-left"
+                >
+                  <span className="text-base font-medium text-ink">{item.question}</span>
+                  <ChevronDownIcon
+                    className={`h-4 w-4 shrink-0 text-burgundy transition-transform ${
+                      isOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+              </h3>
               {isOpen && (
                 <p className="pb-5 pr-8 text-sm leading-relaxed text-charcoal-muted">
                   {item.answer}
