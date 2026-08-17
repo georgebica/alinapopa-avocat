@@ -22,12 +22,12 @@ export function Footer() {
           <p className="text-sm font-medium text-ink">Contact</p>
           <ul className="mt-4 space-y-2 text-sm text-charcoal-muted">
             <li>
-              <a href={telLink()} className="hover:text-burgundy-deep">
+              <a href={telLink()} className="transition-colors hover:text-burgundy-deep">
                 {firm.phoneDisplay}
               </a>
             </li>
             <li>
-              <a href={mailtoLink()} className="hover:text-burgundy-deep">
+              <a href={mailtoLink()} className="transition-colors hover:text-burgundy-deep">
                 {firm.email}
               </a>
             </li>
@@ -40,7 +40,7 @@ export function Footer() {
           <ul className="mt-4 space-y-2 text-sm text-charcoal-muted">
             {services.slice(0, 5).map((service) => (
               <li key={service.slug}>
-                <Link href={`/servicii/${service.slug}`} className="hover:text-burgundy-deep">
+                <Link href={`/servicii/${service.slug}`} className="transition-colors hover:text-burgundy-deep">
                   {service.shortTitle}
                 </Link>
               </li>
@@ -57,22 +57,22 @@ export function Footer() {
           <p className="text-sm font-medium text-ink">Cabinet</p>
           <ul className="mt-4 space-y-2 text-sm text-charcoal-muted">
             <li>
-              <Link href="/despre-noi" className="hover:text-burgundy-deep">
+              <Link href="/despre-noi" className="transition-colors hover:text-burgundy-deep">
                 Despre noi
               </Link>
             </li>
             <li>
-              <Link href="/contact" className="hover:text-burgundy-deep">
+              <Link href="/contact" className="transition-colors hover:text-burgundy-deep">
                 Contact
               </Link>
             </li>
             <li>
-              <Link href="/politica-de-confidentialitate" className="hover:text-burgundy-deep">
+              <Link href="/politica-de-confidentialitate" className="transition-colors hover:text-burgundy-deep">
                 Politica de confidențialitate
               </Link>
             </li>
             <li>
-              <Link href="/termeni-si-conditii" className="hover:text-burgundy-deep">
+              <Link href="/termeni-si-conditii" className="transition-colors hover:text-burgundy-deep">
                 Termeni și condiții
               </Link>
             </li>

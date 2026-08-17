@@ -14,11 +14,22 @@ const primaryLinks = [
   { href: "/contact", label: "Contact" },
 ];
 
+/** Desktop link treatment: quiet ink at rest, burgundy with a gilt hairline
+ *  underneath when hovered or when it names the page we're on — the viewer
+ *  can always read their location off the header. */
+const desktopLink = (active: boolean) =>
+  `relative py-1 text-sm transition-colors duration-200 hover:text-burgundy-deep after:absolute after:inset-x-0 after:-bottom-0.5 after:h-px after:origin-left after:scale-x-0 after:bg-gold-deep after:transition-transform after:duration-300 after:ease-out hover:after:scale-x-100 ${
+    active ? "text-burgundy-deep after:scale-x-100" : "text-ink"
+  }`;
+
 export function Nav() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false);
   const [lastPathname, setLastPathname] = useState(pathname);
+
+  const isActive = (href: string) =>
+    href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);
 
   // Close the mobile drawer on navigation. Adjusting state during render
   // (rather than in an effect) avoids an extra commit/flash of the open drawer.
@@ -44,35 +55,40 @@ export function Nav() {
         </Link>
 
         <nav className="hidden items-center gap-8 lg:flex">
-          <Link href="/" className="text-sm text-ink hover:text-burgundy-deep">
+          <Link href="/" className={desktopLink(isActive("/"))}>
             Acasă
           </Link>
-          <Link href="/despre-noi" className="text-sm text-ink hover:text-burgundy-deep">
+          <Link href="/despre-noi" className={desktopLink(isActive("/despre-noi"))}>
             Despre noi
           </Link>
 
           <div className="group relative">
             <Link
               href="/servicii"
-              className="flex items-center gap-1 text-sm text-ink hover:text-burgundy-deep"
+              className={`flex items-center gap-1 ${desktopLink(isActive("/servicii"))}`}
             >
               Servicii
-              <ChevronDownIcon className="h-3.5 w-3.5" />
+              <ChevronDownIcon className="h-3.5 w-3.5 transition-transform duration-200 group-hover:rotate-180" />
             </Link>
-            <div className="invisible absolute left-1/2 top-full grid w-[560px] -translate-x-1/2 grid-cols-2 gap-x-6 gap-y-1 rounded-xl border border-line bg-surface p-4 opacity-0 shadow-lg transition-all group-hover:visible group-hover:opacity-100">
-              {services.map((service) => (
-                <Link
-                  key={service.slug}
-                  href={`/servicii/${service.slug}`}
-                  className="rounded-lg px-3 py-2 text-sm text-charcoal-muted hover:bg-line/40 hover:text-ink"
-                >
-                  {service.shortTitle}
-                </Link>
-              ))}
+            {/* `pt-3` on the outer wrapper is the hover bridge between trigger
+                and panel; opening on focus-within keeps the menu reachable on
+                the keyboard, not just under a mouse. */}
+            <div className="invisible absolute left-1/2 top-full -translate-x-1/2 pt-3 opacity-0 transition-[opacity,visibility] duration-200 ease-out group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
+              <div className="grid w-[560px] -translate-y-1 grid-cols-2 gap-x-6 gap-y-1 rounded-xl border border-line bg-surface p-4 shadow-[0_28px_56px_-28px_rgba(30,23,25,0.35)] transition-transform duration-200 ease-out group-hover:translate-y-0 group-focus-within:translate-y-0">
+                {services.map((service) => (
+                  <Link
+                    key={service.slug}
+                    href={`/servicii/${service.slug}`}
+                    className="rounded-lg px-3 py-2 text-sm text-charcoal-muted transition-colors duration-150 hover:bg-sand hover:text-burgundy-deep"
+                  >
+                    {service.shortTitle}
+                  </Link>
+                ))}
+              </div>
             </div>
           </div>
 
-          <Link href="/contact" className="text-sm text-ink hover:text-burgundy-deep">
+          <Link href="/contact" className={desktopLink(isActive("/contact"))}>
             Contact
           </Link>
           <PremiumButton href="/contact" size="sm">
@@ -101,7 +117,9 @@ export function Nav() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="min-tap flex items-center rounded-lg px-3 py-3 text-base text-ink hover:bg-line/40"
+                  className={`min-tap flex items-center rounded-lg px-3 py-3 text-base hover:bg-line/40 ${
+                    isActive(link.href) ? "font-medium text-burgundy-deep" : "text-ink"
+                  }`}
                 >
                   {link.label}
                 </Link>

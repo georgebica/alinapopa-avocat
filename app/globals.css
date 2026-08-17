@@ -55,6 +55,26 @@
     letter-spacing: -0.015em;
   }
 
+  /* Multi-line headlines rag evenly instead of stranding one word. */
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  /* Keyboard focus must be visible everywhere; gilt ring, offset off the
+     element so it reads on both the white pages and the burgundy scene. */
+  :focus-visible {
+    outline: 2px solid var(--gold-deep);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  ::selection {
+    background: var(--burgundy);
+    color: var(--surface);
+  }
+
   h1 {
     font-size: 2rem;
     line-height: 1.15;
@@ -76,6 +96,26 @@
   .min-tap {
     min-height: 44px;
     min-width: 44px;
+  }
+}
+
+/* The hero's scroll cue: a gold bead sliding down a hairline, telling the
+   viewer the opening scene is driven by their scroll. Hidden for
+   reduced-motion readers by the global animation kill below. */
+@keyframes cue-bead {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  75% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(28px);
+    opacity: 0;
   }
 }
 

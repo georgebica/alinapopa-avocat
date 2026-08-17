@@ -51,6 +51,7 @@ export function Hero() {
   const topScrimRef = useRef<HTMLDivElement>(null);
   const bottomScrimRef = useRef<HTMLDivElement>(null);
   const mobileBarRef = useRef<HTMLDivElement>(null);
+  const cueRef = useRef<HTMLDivElement>(null);
   const rotationState = useRef(createRotationState());
 
   const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
@@ -125,6 +126,11 @@ export function Hero() {
       mobileBarRef.current.style.opacity = String(1 - retreat);
       mobileBarRef.current.style.pointerEvents = retreat > 0.5 ? "none" : "auto";
     }
+
+    // The scroll cue has done its job the moment the viewer starts moving.
+    if (cueRef.current) {
+      cueRef.current.style.opacity = String(mapRange(progress, [0.02, 0.1], [1, 0]));
+    }
   });
 
   // Reduced motion gets a calm, stacked hero: nothing pinned, nothing overlapping,
@@ -156,7 +162,7 @@ export function Hero() {
             </div>
           </div>
 
-          <CTAButtons className="items-center" />
+          <CTAButtons align="center" />
         </div>
       </section>
     );
@@ -274,8 +280,25 @@ export function Hero() {
 
             {/* On phones the actions live in the fixed bar below instead, so the
                 scroll sequence never pushes them out of thumb reach. */}
-            <CTAButtons className="hidden items-center lg:flex" />
+            <CTAButtons align="center" className="hidden lg:flex" />
           </div>
+        </div>
+
+        {/* Scroll cue on the right edge, clear of the centred copy column:
+            the opening scene is scroll-driven, and nothing else says so. It
+            fades the moment the viewer starts. */}
+        <div
+          ref={cueRef}
+          aria-hidden="true"
+          className="pointer-events-none absolute bottom-8 right-8 z-10 hidden flex-col items-center gap-3 will-change-[opacity] lg:flex"
+          style={{ opacity: 1 }}
+        >
+          <span className="text-[10px] font-medium uppercase tracking-[0.3em] text-charcoal-muted [writing-mode:vertical-rl]">
+            Derulați
+          </span>
+          <span className="relative h-9 w-px overflow-hidden bg-line">
+            <span className="absolute left-0 top-0 h-2 w-px bg-gold-deep [animation:cue-bead_2.2s_ease-in-out_infinite]" />
+          </span>
         </div>
       </div>
 

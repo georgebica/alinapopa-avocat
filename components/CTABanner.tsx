@@ -32,9 +32,16 @@ const DOCK_REARM = 0.5;
 /** Length of the assisted glide, in ms. Long enough to read as the page
  *  settling into place, short enough that the taken-over scroll never feels
  *  stuck. */
-const DOCK_DURATION = 550;
+const DOCK_DURATION = 450;
 
 const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
+
+/** The page carries `scroll-behavior: smooth` (globals.css), which would turn
+ *  every per-frame `scrollTo` into its own browser-driven smooth animation —
+ *  the two animations fight and the glide turns to rubber. Each write must be
+ *  an instant jump; the glide supplies its own easing. */
+const jumpTo = (top: number) =>
+  window.scrollTo({ top, behavior: "instant" as ScrollBehavior });
 
 /** Starts the GLB download at HTML parse time, in parallel with the scripts
  *  that will eventually consume it — instead of after hydration, when the
@@ -227,11 +234,15 @@ export function CTABanner() {
    * The assisted landing: from the trigger point the page finishes the entry
    * itself — a short eased glide to the position where the section's bottom
    * edge meets the viewport's, i.e. exactly progress 1 — and stops there.
-   * Wheel and touch input are swallowed for the glide's duration so the
-   * viewer's leftover momentum can neither overshoot the docked frame nor
-   * stutter the landing; the listeners come off the moment it lands and the
-   * scroll is theirs again. The glide crosses the strike point on the way
-   * down, so the hit and the stamped-in actions play during the takeover.
+   * The glide crosses the strike point on the way down, so the hit and the
+   * stamped-in actions play during the takeover.
+   *
+   * Seamlessness rules: leftover downward wheel momentum is swallowed (the
+   * glide is already going there, and letting it through would overshoot the
+   * landing), but the viewer is never trapped — an upward wheel tick or a new
+   * touch cancels the glide on the spot and hands the scroll straight back.
+   * Touch scrolling is never blocked at all: fighting a finger reads as a
+   * broken page, so on touch the glide simply yields.
    */
   const dock = useCallback(() => {
     const wrapper = wrapperRef.current;
@@ -246,19 +257,27 @@ export function CTABanner() {
 
     docking.current = true;
 
-    const swallow = (event: Event) => event.preventDefault();
-    window.addEventListener("wheel", swallow, { passive: false });
-    window.addEventListener("touchmove", swallow, { passive: false });
+    const cancel = () => {
+      cancelAnimationFrame(dockFrame.current);
+      docking.current = false;
+      releaseInput.current?.();
+    };
+    const onWheel = (event: WheelEvent) => {
+      if (event.deltaY < 0) cancel();
+      else event.preventDefault();
+    };
+    window.addEventListener("wheel", onWheel, { passive: false });
+    window.addEventListener("touchstart", cancel, { passive: true });
     releaseInput.current = () => {
-      window.removeEventListener("wheel", swallow);
-      window.removeEventListener("touchmove", swallow);
+      window.removeEventListener("wheel", onWheel);
+      window.removeEventListener("touchstart", cancel);
       releaseInput.current = null;
     };
 
     const start = performance.now();
     const step = (now: number) => {
       const t = Math.min(1, (now - start) / DOCK_DURATION);
-      window.scrollTo(0, from + distance * easeOutCubic(t));
+      jumpTo(from + distance * easeOutCubic(t));
       if (t < 1) {
         dockFrame.current = requestAnimationFrame(step);
       } else {

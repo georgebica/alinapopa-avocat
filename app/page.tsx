@@ -27,13 +27,14 @@ export default function Home() {
 
       <section className="px-6 py-16 lg:px-16 lg:py-24">
         <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[2fr_3fr] lg:gap-16">
-          <div>
+          <Reveal>
             <p className="text-[11px] font-medium uppercase tracking-[0.32em] text-gold-deep sm:text-xs">
               Prezentare
             </p>
             <h2 className="mt-3 text-2xl lg:text-3xl">Cabinet de Avocat Alina Popa</h2>
-          </div>
-          <div className="flex flex-col gap-4 text-base leading-relaxed text-charcoal-muted">
+            <div aria-hidden="true" className="mt-5 h-px w-12 bg-gold" />
+          </Reveal>
+          <Reveal delay={120} className="flex flex-col gap-4 text-base leading-relaxed text-charcoal-muted">
             <p>
               Cabinetul de Avocat Alina Popa a fost fondat în anul {firm.founded} și activează în
               {" "}
@@ -46,7 +47,7 @@ export default function Home() {
               juridică și reprezentare în litigii, abordând fiecare problemă juridică cu
               seriozitate, atenție și dorință de perfecționare continuă.
             </p>
-          </div>
+          </Reveal>
         </div>
       </section>
 
@@ -70,13 +71,17 @@ export default function Home() {
 
       <section className="border-t border-line px-6 py-16 lg:px-16 lg:py-24">
         <div className="mx-auto max-w-6xl">
-          <p className="text-[11px] font-medium uppercase tracking-[0.32em] text-gold-deep sm:text-xs">
-            Avantaje
-          </p>
-          <h2 className="mt-3 max-w-2xl text-2xl lg:text-3xl">Valorile cabinetului</h2>
+          <Reveal>
+            <p className="text-[11px] font-medium uppercase tracking-[0.32em] text-gold-deep sm:text-xs">
+              Avantaje
+            </p>
+            <h2 className="mt-3 max-w-2xl text-2xl lg:text-3xl">Valorile cabinetului</h2>
+          </Reveal>
           <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {firm.values.map((value) => (
-              <ValueCard key={value.name} name={value.name} description={value.description} />
+            {firm.values.map((value, index) => (
+              <Reveal key={value.name} delay={index * 80}>
+                <ValueCard name={value.name} description={value.description} />
+              </Reveal>
             ))}
           </div>
         </div>
@@ -88,7 +93,7 @@ export default function Home() {
 
       <section className="border-t border-line px-6 py-16 lg:px-16 lg:py-24">
         <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-2 lg:gap-16">
-          <div>
+          <Reveal>
             <p className="text-[11px] font-medium uppercase tracking-[0.32em] text-gold-deep sm:text-xs">Contact</p>
             <h2 className="mt-3 text-2xl lg:text-3xl">Date de contact</h2>
 
@@ -103,13 +108,13 @@ export default function Home() {
               </li>
               <li className="flex items-center gap-3">
                 <PhoneIcon className="h-5 w-5 shrink-0 text-burgundy" />
-                <a href={telLink()} className="hover:text-burgundy-deep">
+                <a href={telLink()} className="transition-colors hover:text-burgundy-deep">
                   {firm.phoneDisplay}
                 </a>
               </li>
               <li className="flex items-center gap-3">
                 <MailIcon className="h-5 w-5 shrink-0 text-burgundy" />
-                <a href={mailtoLink()} className="hover:text-burgundy-deep">
+                <a href={mailtoLink()} className="transition-colors hover:text-burgundy-deep">
                   {firm.email}
                 </a>
               </li>
@@ -118,9 +123,11 @@ export default function Home() {
                 {firm.hours.display}
               </li>
             </ul>
-          </div>
+          </Reveal>
 
-          <MapEmbed />
+          <Reveal delay={120}>
+            <MapEmbed />
+          </Reveal>
         </div>
       </section>
     </>

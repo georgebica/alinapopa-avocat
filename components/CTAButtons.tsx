@@ -11,6 +11,14 @@ type Props = {
    * rows would eat an eighth of the screen.
    */
   layout?: "stack" | "bar";
+  /**
+   * Cross-axis alignment of the stacked layout. A prop rather than a caller
+   * class: `items-*` utilities passed via className would collide with the
+   * one hardcoded here and the winner would be decided by stylesheet order,
+   * not by the caller's intent — which is how the hero's actions ended up
+   * off-centre.
+   */
+  align?: "start" | "center";
 };
 
 /**
@@ -19,7 +27,12 @@ type Props = {
  * separators. The channels are footnotes to the consultation CTA, never a
  * second row of buttons competing with it.
  */
-export function CTAButtons({ className = "", variant = "light", layout = "stack" }: Props) {
+export function CTAButtons({
+  className = "",
+  variant = "light",
+  layout = "stack",
+  align = "start",
+}: Props) {
   const quiet = `inline-flex min-tap items-center gap-2 text-[13px] tracking-wide transition-colors ${
     variant === "dark"
       ? "text-surface/55 hover:text-gold"
@@ -64,7 +77,11 @@ export function CTAButtons({ className = "", variant = "light", layout = "stack"
   }
 
   return (
-    <div className={`flex w-full flex-col items-start gap-5 sm:w-auto ${className}`}>
+    <div
+      className={`flex w-full flex-col gap-5 sm:w-auto ${
+        align === "center" ? "items-center" : "items-start"
+      } ${className}`}
+    >
       <PremiumButton href="/contact" className="w-full sm:w-auto">
         Solicită o consultație
       </PremiumButton>
