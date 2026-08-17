@@ -18,6 +18,24 @@ const GavelScene = dynamic(() => import("./gavel/GavelScene"), { ssr: false });
 // preload is wasted and the file downloads twice.
 const MODEL_URL = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/models/gavel.glb`;
 
+/** Entry progress at which the page takes the scroll over and docks the scene
+ *  itself. Just below the strike point, so the assisted glide is what carries
+ *  the sequence through the release: the viewer's own scroll ends moments
+ *  before the actions appear, and the strike lands during the glide. */
+const DOCK_TRIGGER = STRIKE_POINT - 0.1;
+
+/** Once the viewer has scrolled back above this much of the entry, the assist
+ *  re-arms and will dock again on the next pass down. The wide gap between
+ *  trigger and reset keeps it from re-firing while they scroll off the end. */
+const DOCK_REARM = 0.5;
+
+/** Length of the assisted glide, in ms. Long enough to read as the page
+ *  settling into place, short enough that the taken-over scroll never feels
+ *  stuck. */
+const DOCK_DURATION = 550;
+
+const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
+
 /** Starts the GLB download at HTML parse time, in parallel with the scripts
  *  that will eventually consume it — instead of after hydration, when the
  *  three.js chunk finally executes and asks for it. React hoists the tag into
@@ -153,6 +171,15 @@ export function CTABanner() {
   const shaftRef = useRef<HTMLDivElement>(null);
   const state = useRef<GavelState>(createGavelState());
 
+  // Docking-assist bookkeeping. `docking` is true while the page owns the
+  // scroll; `docked` stays true after landing so the assist fires once per
+  // downward pass; `prevProgress` gives the scroll direction.
+  const docking = useRef(false);
+  const docked = useRef(false);
+  const prevProgress = useRef(0);
+  const dockFrame = useRef(0);
+  const releaseInput = useRef<(() => void) | null>(null);
+
   const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
 
   // Entry progress: 0 with the section's top at the viewport's bottom edge,
@@ -196,14 +223,89 @@ export function CTABanner() {
     }
   }, []);
 
+  /**
+   * The assisted landing: from the trigger point the page finishes the entry
+   * itself — a short eased glide to the position where the section's bottom
+   * edge meets the viewport's, i.e. exactly progress 1 — and stops there.
+   * Wheel and touch input are swallowed for the glide's duration so the
+   * viewer's leftover momentum can neither overshoot the docked frame nor
+   * stutter the landing; the listeners come off the moment it lands and the
+   * scroll is theirs again. The glide crosses the strike point on the way
+   * down, so the hit and the stamped-in actions play during the takeover.
+   */
+  const dock = useCallback(() => {
+    const wrapper = wrapperRef.current;
+    if (!wrapper) return;
+
+    const target = Math.round(
+      window.scrollY + wrapper.getBoundingClientRect().bottom - window.innerHeight
+    );
+    const from = window.scrollY;
+    const distance = target - from;
+    if (distance <= 0) return;
+
+    docking.current = true;
+
+    const swallow = (event: Event) => event.preventDefault();
+    window.addEventListener("wheel", swallow, { passive: false });
+    window.addEventListener("touchmove", swallow, { passive: false });
+    releaseInput.current = () => {
+      window.removeEventListener("wheel", swallow);
+      window.removeEventListener("touchmove", swallow);
+      releaseInput.current = null;
+    };
+
+    const start = performance.now();
+    const step = (now: number) => {
+      const t = Math.min(1, (now - start) / DOCK_DURATION);
+      window.scrollTo(0, from + distance * easeOutCubic(t));
+      if (t < 1) {
+        dockFrame.current = requestAnimationFrame(step);
+      } else {
+        docking.current = false;
+        releaseInput.current?.();
+      }
+    };
+    dockFrame.current = requestAnimationFrame(step);
+  }, []);
+
+  // Landing an interrupted glide would leak the input listeners; unmount must
+  // always hand the scroll back.
+  useEffect(
+    () => () => {
+      cancelAnimationFrame(dockFrame.current);
+      releaseInput.current?.();
+    },
+    []
+  );
+
   useMotionValueEvent(scrollYProgress, "change", (progress) => {
-    if (!reducedMotion) apply(progress);
+    if (reducedMotion) return;
+    apply(progress);
+
+    const prev = prevProgress.current;
+    prevProgress.current = progress;
+    if (docking.current) return;
+
+    // Re-arm only once the viewer has clearly left the landing zone upwards.
+    if (progress <= DOCK_REARM) docked.current = false;
+
+    if (!docked.current && progress > prev && progress >= DOCK_TRIGGER && progress < 1) {
+      docked.current = true;
+      dock();
+    }
   });
 
   // A reload part-way down the page lands mid-sequence: seed every scroll-linked
   // style from the real position rather than waiting for the first scroll event.
+  // The direction tracker is seeded too, or the first upward scroll after such
+  // a reload would read as downward and fire the docking assist.
   useEffect(() => {
-    if (!reducedMotion) apply(scrollYProgress.get());
+    if (reducedMotion) return;
+    const progress = scrollYProgress.get();
+    prevProgress.current = progress;
+    if (progress >= 1) docked.current = true;
+    apply(progress);
   }, [reducedMotion, scrollYProgress, apply]);
 
   // Reduced motion gets a calm single screen: the same graded atmosphere, the
