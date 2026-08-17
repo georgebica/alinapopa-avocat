@@ -3,9 +3,9 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { firm } from "@/content/firm";
+import { firm, telLink } from "@/content/firm";
 import { services } from "@/content/services";
-import { ChevronDownIcon, CloseIcon, MenuIcon } from "./icons";
+import { ChevronDownIcon, CloseIcon, MenuIcon, PhoneIcon } from "./icons";
 import { PremiumButton } from "./PremiumButton";
 
 const primaryLinks = [
@@ -49,9 +49,18 @@ export function Nav() {
   return (
     <>
     <header className="sticky top-0 z-50 border-b border-line bg-surface/95 backdrop-blur">
+      {/* Gilt ribbon along the top edge — absolute, so the header keeps its
+          exact 4rem height that the hero pin and closing scene are sized to. */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-burgundy via-gold to-burgundy"
+      />
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6 lg:px-8">
-        <Link href="/" className="font-display text-lg text-ink">
-          {firm.shortName}
+        <Link href="/" className="flex flex-col justify-center leading-none">
+          <span className="font-display text-lg text-ink">{firm.shortName}</span>
+          <span className="mt-1 text-[8.5px] font-medium uppercase tracking-[0.3em] text-gold-deep">
+            Cabinet de avocat
+          </span>
         </Link>
 
         <nav className="hidden items-center gap-8 lg:flex">
@@ -96,15 +105,27 @@ export function Nav() {
           </PremiumButton>
         </nav>
 
-        <button
-          type="button"
-          aria-label={open ? "Închide meniul" : "Deschide meniul"}
-          aria-expanded={open}
-          onClick={() => setOpen((v) => !v)}
-          className="min-tap flex items-center justify-center rounded-full text-ink lg:hidden"
-        >
-          {open ? <CloseIcon className="h-6 w-6" /> : <MenuIcon className="h-6 w-6" />}
-        </button>
+        {/* Phone header actions: a direct call — the errand most mobile
+            visitors arrive with — and the menu, both as ringed buttons so the
+            bar reads composed rather than bare. */}
+        <div className="flex items-center gap-2.5 lg:hidden">
+          <a
+            href={telLink()}
+            aria-label="Sună acum"
+            className="min-tap flex items-center justify-center rounded-full border border-line text-burgundy transition-colors hover:border-gold/60 hover:text-burgundy-deep"
+          >
+            <PhoneIcon className="h-[18px] w-[18px]" />
+          </a>
+          <button
+            type="button"
+            aria-label={open ? "Închide meniul" : "Deschide meniul"}
+            aria-expanded={open}
+            onClick={() => setOpen((v) => !v)}
+            className="min-tap flex items-center justify-center rounded-full border border-line text-ink transition-colors hover:border-gold/60"
+          >
+            {open ? <CloseIcon className="h-5 w-5" /> : <MenuIcon className="h-5 w-5" />}
+          </button>
+        </div>
       </div>
     </header>
 

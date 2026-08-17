@@ -131,10 +131,12 @@ function SectionDots() {
 }
 
 /** Eyebrow, headline, supporting line, actions — shared verbatim between the
- *  scrolling scene and the reduced-motion still. */
+ *  scrolling scene and the reduced-motion still. Centred in the phone
+ *  composition, where the copy sits axially above the gavel; left-set on
+ *  desktop, where it holds the left column against the gavel on the right. */
 function ClosingCopy({ actionsRef }: { actionsRef?: RefObject<HTMLDivElement | null> }) {
   return (
-    <div className="flex max-w-xl flex-col items-start gap-5 sm:gap-6">
+    <div className="flex max-w-xl flex-col items-center gap-5 text-center sm:gap-6 lg:items-start lg:text-left">
       <p className="text-[11px] font-medium uppercase tracking-[0.32em] text-gold">
         Cabinet de avocat · {firm.city}
       </p>
@@ -145,7 +147,7 @@ function ClosingCopy({ actionsRef }: { actionsRef?: RefObject<HTMLDivElement | n
         {firm.cta.text}
       </p>
       <div ref={actionsRef} style={{ opacity: 1 }} className="w-full will-change-[opacity,transform] sm:w-auto">
-        <CTAButtons variant="dark" />
+        <CTAButtons variant="dark" align="center-lg-start" />
       </div>
     </div>
   );
@@ -363,7 +365,7 @@ export function CTABanner() {
           interrupts the reading order. */}
       <div
         aria-hidden="true"
-        className="absolute bottom-[-4svh] left-1/2 h-[62svh] w-[120%] -translate-x-1/2 sm:h-[64svh] sm:w-[105%] lg:bottom-auto lg:left-auto lg:right-[-7%] lg:top-1/2 lg:h-[92svh] lg:w-[62%] lg:-translate-y-1/2 lg:translate-x-0"
+        className="absolute bottom-[2svh] left-1/2 h-[54svh] w-[112%] -translate-x-[41%] sm:h-[56svh] sm:w-[92%] sm:-translate-x-1/2 lg:bottom-auto lg:left-auto lg:right-[-7%] lg:top-1/2 lg:h-[92svh] lg:w-[62%] lg:-translate-y-1/2 lg:translate-x-0"
       >
         {/* Brass halo and a diffuse floor pool, so the render sits in lit
             space on a surface instead of floating on the grade. */}
@@ -381,7 +383,7 @@ export function CTABanner() {
       {/* The copy layer, floated over the scene rather than gridded against
           it: the upper half of the frame on a phone (the gavel owns the
           lower), vertically centred on the left on desktop. */}
-      <div className="relative z-10 mx-auto flex h-full w-full max-w-6xl flex-col justify-start px-6 pt-[6svh] sm:px-10 lg:justify-center lg:px-16 lg:pt-0">
+      <div className="relative z-10 mx-auto flex h-full w-full max-w-6xl flex-col items-center justify-start px-6 pt-[6svh] sm:px-10 lg:items-start lg:justify-center lg:px-16 lg:pt-0">
         <ClosingCopy actionsRef={actionsRef} />
       </div>
 

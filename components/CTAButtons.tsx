@@ -16,9 +16,16 @@ type Props = {
    * class: `items-*` utilities passed via className would collide with the
    * one hardcoded here and the winner would be decided by stylesheet order,
    * not by the caller's intent — which is how the hero's actions ended up
-   * off-centre.
+   * off-centre. "center-lg-start" is for the closing scene: centred in the
+   * phone composition, left-set in the wide-screen one.
    */
-  align?: "start" | "center";
+  align?: "start" | "center" | "center-lg-start";
+};
+
+const ALIGNMENT: Record<NonNullable<Props["align"]>, string> = {
+  start: "items-start",
+  center: "items-center",
+  "center-lg-start": "items-center lg:items-start",
 };
 
 /**
@@ -77,11 +84,7 @@ export function CTAButtons({
   }
 
   return (
-    <div
-      className={`flex w-full flex-col gap-5 sm:w-auto ${
-        align === "center" ? "items-center" : "items-start"
-      } ${className}`}
-    >
+    <div className={`flex w-full flex-col gap-5 sm:w-auto ${ALIGNMENT[align]} ${className}`}>
       <PremiumButton href="/contact" className="w-full sm:w-auto">
         Solicită o consultație
       </PremiumButton>
