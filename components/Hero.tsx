@@ -159,7 +159,7 @@ export function Hero() {
           <div className="relative my-2 h-[38vh] min-h-[240px] w-full">
             <p
               aria-hidden="true"
-              className="pointer-events-none absolute left-1/2 top-1/2 w-full -translate-x-1/2 -translate-y-1/2 select-none text-center font-display text-[23vw] font-medium leading-none text-burgundy opacity-[0.09] lg:text-[15vw]"
+              className="pointer-events-none absolute left-1/2 top-1/2 w-full -translate-x-1/2 -translate-y-1/2 select-none text-center font-display text-[17vw] font-medium leading-none text-burgundy opacity-[0.09] lg:text-[15vw]"
             >
               {WATERMARK}
             </p>
@@ -198,7 +198,7 @@ export function Hero() {
           ref={watermarkRef}
           aria-hidden="true"
           style={{ opacity: 0.07 }}
-          className="pointer-events-none absolute left-1/2 top-1/2 w-full -translate-x-1/2 -translate-y-1/2 select-none text-center font-display text-[23vw] font-medium leading-none text-burgundy lg:text-[15vw]"
+          className="pointer-events-none absolute left-1/2 top-1/2 w-full -translate-x-1/2 -translate-y-1/2 select-none text-center font-display text-[17vw] font-medium leading-none text-burgundy lg:text-[15vw]"
         >
           {WATERMARK}
         </p>
