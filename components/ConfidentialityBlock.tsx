@@ -15,7 +15,10 @@ export function ConfidentialityBlock() {
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-gold/40 bg-surface">
             <ShieldIcon className="h-6 w-6 text-gold-deep" />
           </div>
-          <h2 className="mt-5 text-2xl lg:text-3xl">Confidențialitate</h2>
+          {/* Not the bare word "Confidențialitate": the value card below the
+              fold carries that exact heading already, and duplicate heading
+              text on one page reads as thin structure to auditors. */}
+          <h2 className="mt-5 text-2xl lg:text-3xl">Confidențialitatea relației avocat-client</h2>
           <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-charcoal-muted">
             {firm.confidentialityStatement}
           </p>

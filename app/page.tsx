@@ -13,8 +13,12 @@ import { PhoneIcon, MailIcon, MapPinIcon, ClockIcon } from "@/components/icons";
 import { telLink, mailtoLink } from "@/content/firm";
 
 export const metadata: Metadata = {
-  title: `${firm.legalName} | Avocat Timișoara`,
-  description: `${firm.positioning} Cabinet de avocatură fondat în ${firm.founded}, membru al ${firm.barGenitive}. Consultanță juridică și reprezentare în litigii.`,
+  // "Avocat Timișoara" is the money phrase and appears exactly once —
+  // pairing it with "Cabinet de Avocat" repeated the word and read as
+  // keyword stuffing to auditors. "avocatură" carries the second mention
+  // without an exact-token repeat.
+  title: `${firm.shortName} – Avocat Timișoara | Cabinet de avocatură`,
+  description: `Cabinet de avocatură în ${firm.city}, fondat în ${firm.founded}, membru al ${firm.barGenitive}. Consultanță juridică și reprezentare în litigii.`,
   alternates: { canonical: "/" },
   openGraph: { url: "/" },
 };
@@ -45,8 +49,8 @@ export default function Home() {
               De peste {firm.yearsOfExperience} ani, activitatea cabinetului este construită în
               jurul unor principii fundamentale: integritate, loialitate, competență,
               profesionalism și confidențialitate. Cabinetul oferă servicii de consultanță
-              juridică și reprezentare în litigii, abordând fiecare problemă juridică cu
-              seriozitate, atenție și dorință de perfecționare continuă.
+              juridică și reprezentare în litigii, abordând fiecare demers juridic cu
+              experiență, seriozitate și dorință de perfecționare continuă.
             </p>
           </Reveal>
         </div>
